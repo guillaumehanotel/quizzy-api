@@ -17,6 +17,14 @@ $api = app('Dingo\Api\Routing\Router');
 
 $api->version('v1', function ($api) {
 
+    $api->get('/',  function(){
+
+        event(new \App\Events\SuccessEvent([
+            'test' => 'helloTest'
+        ]));
+
+    });
+
     $api->group(['middleware' => 'api'], function ($api) {
 
         $api->post("register", 'App\Http\Controllers\Api\Auth\RegisterController@register');
