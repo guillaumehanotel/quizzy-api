@@ -17,13 +17,16 @@ $api = app('Dingo\Api\Routing\Router');
 
 $api->version('v1', function ($api) {
 
-    $api->get('/',  function(){
+//    $api->get('/',  function(){
+//
+//        event(new \App\Events\SuccessEvent([
+//            'test' => 'helloTest'
+//        ]));
+//
+//    });
 
-        event(new \App\Events\SuccessEvent([
-            'test' => 'helloTest'
-        ]));
-
-    });
+    $api->get('/quizz/create','App\Http\Controllers\Api\QuizzController@create');
+    $api->get('/quizz/{id}','App\Http\Controllers\Api\QuizzController@emitQuizzCreated');
 
     $api->group(['middleware' => 'api'], function ($api) {
 
