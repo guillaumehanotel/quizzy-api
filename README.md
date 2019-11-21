@@ -6,6 +6,11 @@ Dupliquer le fichier .env.example et le renommer en .env. Modifier les accès à
 API_PREFIX=api
 ```
 
+Générer une clé pour l'application
+```
+php artisan key:generate
+```
+
 Pour créer les tables lancer la commande 
 ```
 php artisan migrate 
