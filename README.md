@@ -58,3 +58,8 @@ Front :
    - socket.io-client
    - laravel-echo
 
+
+
+
+
+https://github.com/mpociot/laravel-apidoc-generator
