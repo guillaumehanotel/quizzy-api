@@ -1,5 +1,26 @@
 # Quizzy API
 
+## Install
+Dupliquer le fichier .env.example et le renommer en .env. Modifier les accès à la base de donnée et ajouter une ligne 
+```
+API_PREFIX=api
+```
+
+Pour créer les tables lancer la commande 
+```
+php artisan migrate 
+```
+
+Installer passport pour l'authentification OAuth
+```
+php artisan passeport:install
+```
+
+Lancer le serveur local
+```
+php artisan serve
+```
+
 ### Principe du Broadcast d'Event via WebSocket :
 
 Dans Laravel, on peut définir des Events. Ce sont des classes qui peuvent 
