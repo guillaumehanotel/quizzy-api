@@ -9,6 +9,7 @@ class CreateQuizzsTable extends Migration {
     public function up() {
         Schema::create('quizzs', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->unsignedBigInteger('genre_id');
             $table->timestamps();
         });
     }
