@@ -10,7 +10,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class QuizzCreatedEvent implements ShouldBroadcast
+class QuizzUserJoinedEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public $params = [];
@@ -23,6 +23,7 @@ class QuizzCreatedEvent implements ShouldBroadcast
     public function __construct($params)
     {
         $this->params = $params;
+//        $this->dontBroadcastToCurrentUser();
     }
 
     /**
@@ -32,7 +33,7 @@ class QuizzCreatedEvent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PresenceChannel('quizz-' . (int)$this->params['id']);
+        return new Channel('quizz-' . (int)$this->params['id']);
     }
 
     /**

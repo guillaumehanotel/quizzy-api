@@ -17,18 +17,12 @@ $api = app('Dingo\Api\Routing\Router');
 
 $api->version('v1', function ($api) {
 
-//    $api->get('/',  function(){
-//
-//        event(new \App\Events\SuccessEvent([
-//            'test' => 'helloTest'
-//        ]));
-//
-//    });
-
-    $api->get('/quizz/create','App\Http\Controllers\Api\QuizzController@create');
-    $api->get('/quizz/{id}','App\Http\Controllers\Api\QuizzController@emitQuizzCreated');
-
     $api->group(['middleware' => 'api'], function ($api) {
+
+        // TODOS: placer les routes quizz dans le middleware auth:api
+        $api->post('/quizz/create','App\Http\Controllers\Api\QuizzController@create');
+        $api->post('/quizz/{id}/user/add','App\Http\Controllers\Api\QuizzController@addUserToQuizz');
+        $api->get('/quizz/{id}','App\Http\Controllers\Api\QuizzController@get');
 
         $api->post("register", 'App\Http\Controllers\Api\Auth\RegisterController@register');
         $api->get("register/{token}", 'App\Http\Controllers\Api\Auth\RegisterController@registerActivate');
@@ -42,6 +36,7 @@ $api->version('v1', function ($api) {
 
     // Protected routes
     $api->group(['middleware' => 'auth:api'], function ($api) {
+
 
         $api->get('me', 'App\Http\Controllers\Api\UserController@me');
         $api->get('logout', 'App\Http\Controllers\Api\Auth\LoginController@logout');
