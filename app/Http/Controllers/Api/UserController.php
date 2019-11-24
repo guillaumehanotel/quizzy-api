@@ -45,15 +45,14 @@ class UserController extends DingoController {
     }
 
     public function store(Request $request) {
-
         $body = $request->json()->all();
         $user = User::create([
-            'name' => $body['username'],
+            'name' => $body['name'],
             'email' => $body['email'],
-            'google_uid' => $body['google_uid'],
+            'google_uid' => $body['googleId'],
             'lastname' => $body['lastname'],
             'firstname' => $body['firstname'],
-            'avatar_url' => $body['avatar_url'],
+            'avatar_url' => $body['avatarUrl'],
             'password' => bcrypt(Str::random(16))
         ]);
 
@@ -66,7 +65,6 @@ class UserController extends DingoController {
         $response = $this->response->item($user, new UserTransformer())
             ->setStatusCode(201)
             ->setMeta($meta);
-
         return $response;
     }
 
