@@ -18,7 +18,7 @@ php artisan migrate
 
 Installer passport pour l'authentification OAuth
 ```
-php artisan passeport:install
+php artisan passport:install
 ```
 
 Lancer le serveur local
