@@ -10,6 +10,7 @@ class CreateQuizzsTable extends Migration {
         Schema::create('quizzs', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('genre_id');
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }

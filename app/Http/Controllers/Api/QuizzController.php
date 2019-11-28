@@ -12,53 +12,25 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use \App\Events\QuizzCreatedEvent;
+use Illuminate\Support\Facades\DB;
 
 class QuizzController extends DingoController {
 
-    public function create(Request $request) {
+    public function findOrCreate(Request $request, $id) {
         try {
-            $genreData = $request->json()->get('genre');
-            $genre = Genre::findOrFail( (int)$genreData['id'] );
-            $quizz = new Quizz();
-            $quizz->genre()->associate($genre);
-            $quizz->save();
+            $genreId = $request->json()->get('genre_id');
+            $quizz = DB::table('quizzs')
+                ->where('id', '=', $id)
+                ->where('genre_id', '=', $genreId)
+                ->where('status', '=', 1)
+                ->get();
 
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'quizz' => $quizz,
-                    'urlToShare' => '/quizz/' . $quizz->id
-                ]
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'error' => $e
-            ]);
-        }
-    }
-
-    public function get($id) {
-        $quizz = Quizz::findOrFail($id);
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'quizz' => $quizz,
-                'users' => $quizz->users()
-            ]
-        ]);
-    }
-
-    public function addUserToQuizz(Request $request, $id) {
-        try {
-            $user = $request->json()->get('user');
-            event(new QuizzUserJoinedEvent([
-                'id' => $id,
-                'user' => $user
-            ]));
-
-            $quizz = Quizz::findOrFail($id);
-            $quizz->users()->attach((int)$user['id']);
+            if (count($quizz) === 0) {
+                $genre = Genre::findOrFail( (int)$genreId );
+                $quizz = new Quizz();
+                $quizz->genre()->associate($genre);
+                $quizz->save();
+            }
 
             return response()->json([
                 'success' => true,

@@ -1,5 +1,6 @@
 <?php
 use \App\Models\Quizz;
+use \Illuminate\Support\Facades\DB;
 /*
 |--------------------------------------------------------------------------
 | Broadcast Channels
@@ -17,9 +18,16 @@ Broadcast::channel('quizz-{id}', function ($user, $id) {
         return false;
     }
 
+    $quizzUsers = DB::table('quizzs_users')
+        ->where('user_id', '=', $user->id)
+        ->where('quizz_id', '=', $id)
+        ->get();
 
+    if (count($quizzUsers) === 0) {
+        $quizz->users()->attach((int)$user->id);
+    }
 
     return [
-        'name' => $user->name
+        'user' => $user
     ];
 });

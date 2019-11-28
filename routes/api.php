@@ -5,25 +5,12 @@ $api = app('Dingo\Api\Routing\Router');
 $api->version('v1', function ($api) {
 
     $UserController = 'App\Http\Controllers\Api\UserController';
-
-//    $api->get('/',  function(){
-//        event(new \App\Events\SuccessEvent([
-//            'test' => 'helloTest'
-//        ]));
-//    });
-
-    $api->get('/quizz/create','App\Http\Controllers\Api\QuizzController@create');
-    $api->get('/quizz/{id}','App\Http\Controllers\Api\QuizzController@emitQuizzCreated');
-
-    $UserController = 'App\Http\Controllers\Api\UserController';
     $GenreController = 'App\Http\Controllers\Api\GenreController';
 
     $api->group(['middleware' => 'api'], function ($api) use ($UserController, $GenreController){
 
         // TODOS: placer les routes quizz dans le middleware auth:api
-        $api->post('/quizz/create','App\Http\Controllers\Api\QuizzController@create');
-        $api->post('/quizz/{id}/user/add','App\Http\Controllers\Api\QuizzController@addUserToQuizz');
-        $api->get('/quizz/{id}','App\Http\Controllers\Api\QuizzController@get');
+        $api->post('/quizz/{id}','App\Http\Controllers\Api\QuizzController@findOrCreate');
 
         $api->post("register", 'App\Http\Controllers\Api\Auth\RegisterController@register');
         $api->post("login", 'App\Http\Controllers\Api\Auth\LoginController@login')->name('login');
