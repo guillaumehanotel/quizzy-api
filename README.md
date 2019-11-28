@@ -85,7 +85,16 @@ Front :
    - laravel-echo
 
 
+### Rejoindre un quizz
 
+#### Partie privée
 
+- Créer une partie en tapant sur la route /api/quizz/create en post et en passant un parametre un objet genre avec son id
+
+- Partager le lien de la partie pour que les autres utilisateurs puissent rejoindre la partie
+
+- Ecouter l'évenement QuizzUserJoinedEvent qui se déclenche lorsqu'un utilisateur rejoint une partie
+
+- Lorsque la partie est prête à démarrer envoyer une requête depuis le front qui declenchera un événement QuizzStartedEvent
 
 https://github.com/mpociot/laravel-apidoc-generator

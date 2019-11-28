@@ -1,5 +1,5 @@
 <?php
-
+use \App\Models\Quizz;
 /*
 |--------------------------------------------------------------------------
 | Broadcast Channels
@@ -11,6 +11,15 @@
 |
 */
 
-Broadcast::channel('App.User.{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
+Broadcast::channel('quizz-{id}', function ($user, $id) {
+    $quizz = Quizz::find($id);
+    if ($quizz === null) {
+        return false;
+    }
+
+
+
+    return [
+        'name' => $user->name
+    ];
 });

@@ -11,4 +11,8 @@ class Genre extends Model {
         'picture_url'
     ];
 
+    public function quizzs() {
+        return $this->hasMany('App\Models\Quizz');
+    }
+
 }

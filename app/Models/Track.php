@@ -16,4 +16,8 @@ class Track extends Model {
         'artist_id'
     ];
 
+    public function quizzs() {
+        return $this->belongsToMany('App\Models\Quizz');
+    }
+
 }
