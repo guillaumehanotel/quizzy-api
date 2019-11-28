@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Transformers\GenreTransformer;
 use App\Models\Genre;
+use Illuminate\Http\Request;
 
 class GenreController extends DingoController {
 
