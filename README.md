@@ -87,10 +87,8 @@ Front :
 
 ### Rejoindre un quizz
 
-#### /api/quizz
+#### ***POST*** /api/quizz
 Créer ou trouve un quizz en cours en fonction du genre. Renvoie le quizz
-
-##### ***POST***
 
 | Name | Located in | Required | Schema |
 | ---- | ---------- | -------- | ---- |
@@ -98,13 +96,8 @@ Créer ou trouve un quizz en cours en fonction du genre. Renvoie le quizz
 
 ---
 
-#### /api/quizz/{id}/tracks
+#### ***GET*** /api/quizz/{id}/tracks
 Récupere 10 tracks aléatoires en fonction du genre du quizz
-##### ***GET***
-
-| Name | Located in | Required | Schema |
-| ---- | ---------- | -------- | ---- |
-| genre_id | body | Yes | int |
 
 ---
 

@@ -7,9 +7,6 @@ $api->version('v1', function ($api) {
     $UserController = 'App\Http\Controllers\Api\UserController';
     $GenreController = 'App\Http\Controllers\Api\GenreController';
 
-    $api->get('/tracks/random/{number}', 'App\Http\Controllers\Api\TrackController@getRandomTracks');
-    $api->get('/genre/{id}/tracks/random/{number}', 'App\Http\Controllers\Api\TrackController@getRandomTracksByGenre');
-
     $api->group(['middleware' => 'api'], function ($api) use ($UserController, $GenreController){
 
         // TODOS: placer les routes quizz dans le middleware auth:api

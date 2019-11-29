@@ -3,14 +3,21 @@
 namespace App\Http\Controllers\Api;
 
 use App\Events\QuizzStartedEvent;
+use App\Http\Transformers\TrackTransformer;
 use App\Models\Genre;
 use App\Models\Quizz;
+use App\Services\MusicService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use League\Fractal;
 
 class QuizzController extends DingoController {
+    private $table;
+    private $musicService;
+
     public function __construct() {
         $this->table = 'quizzs';
+        $this->musicService = new MusicService();
     }
 
     public function findOrCreate(Request $request) {
@@ -45,13 +52,14 @@ class QuizzController extends DingoController {
     public function getTracks($id) {
         $quizz = Quizz::find($id);
 
-        // récupérer des tracks random en fonction du genre id
-        $tracks = [];
-//        $tracks = DB::table('tracks')
-//            ->leftJoin('artists', 'artists.id', '=', 'tracks.artist_id')
-//            ->leftJoin('genres', 'genres.id', '=', 'artists.genre_id')
-//            ->where('genres.id', '=', $quizz->genre_id)
-//            ->get();
+        if ($quizz === null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No quizz found'
+            ]);
+        }
+
+        $tracks = $this->musicService->getRandomMusicByGenreId(1, $quizz->genre_id);
 
         event(new QuizzStartedEvent([
             'id' => $id,
@@ -59,10 +67,7 @@ class QuizzController extends DingoController {
         ]));
 
         return response()->json([
-            'success' => true,
-            'data' => [
-                'tracks' => $tracks
-            ]
+            'success' => true
         ]);
     }
 

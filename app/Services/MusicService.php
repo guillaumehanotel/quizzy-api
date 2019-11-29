@@ -26,9 +26,9 @@ class MusicService {
         $artists = $genre->artists()->inRandomOrder()->limit($musicNumber)->get();
         /** @var Artist $artist */
         foreach ($artists as $artist) {
-            array_push($tracks, $artist->tracks()->inRandomOrder()->first());
+            array_push($tracks, ($artist->tracks()->inRandomOrder()->first())->toArray());
         };
-        return collect($tracks);
+        return $tracks;
     }
 
 }
