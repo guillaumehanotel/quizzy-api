@@ -10,7 +10,8 @@ $api->version('v1', function ($api) {
     $api->group(['middleware' => 'api'], function ($api) use ($UserController, $GenreController){
 
         $api->post('/quizz','App\Http\Controllers\Api\QuizzController@findOrCreate');
-        $api->get('/quizz/{id}/tracks','App\Http\Controllers\Api\QuizzController@getTracks');
+        $api->get('/quizz/{id}','App\Http\Controllers\Api\QuizzController@getQuizzData');
+        $api->get('/quizz/{id}/askTrack','App\Http\Controllers\Api\QuizzController@getTracks');
 
         $api->post("register", 'App\Http\Controllers\Api\Auth\RegisterController@register');
         $api->post("login", 'App\Http\Controllers\Api\Auth\LoginController@login')->name('login');

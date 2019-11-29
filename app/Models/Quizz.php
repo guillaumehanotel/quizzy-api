@@ -7,11 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 class Quizz extends Model {
 
     public function users() {
-        return $this->belongsToMany('App\Models\User', 'quizzs_users')->withTimestamps();
+        return $this->belongsToMany('App\Models\User', 'quizzs_users')
+            ->withTimestamps()
+            ->withPivot([
+                'winner',
+                'points'
+            ]);
     }
 
     public function tracks() {
-        return $this->belongsToMany('App\Models\Track', 'quizzs_tracks')->withTimestamps();
+        return $this->belongsToMany('App\Models\Track', 'quizzs_tracks')
+            ->withTimestamps();
     }
 
     public function genre() {

@@ -8,7 +8,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
 
-class QuizzSongStartedEvent implements ShouldBroadcast {
+class QuizzStartedEvent implements ShouldBroadcast {
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public $params = [];
     /**
@@ -37,7 +37,7 @@ class QuizzSongStartedEvent implements ShouldBroadcast {
     public function broadcastWith()
     {
         return [
-            'song' => $this->params['track']['preview_url']
+            'duration' => $this->params['duration']
         ];
     }
 

@@ -2,15 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Events\QuizzSongStartedEvent;
-use App\Http\Transformers\TrackTransformer;
+use App\Events\QuizzSongInitEvent;
+use App\Events\QuizzStartedEvent;
 use App\Models\Genre;
 use App\Models\Quizz;
-use App\Models\Track;
 use App\Services\MusicService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use League\Fractal;
 
 class QuizzController extends DingoController {
     private $table;
@@ -34,6 +32,10 @@ class QuizzController extends DingoController {
                 $quizz = new Quizz();
                 $quizz->genre()->associate($genre);
                 $quizz->save();
+                event(new QuizzStartedEvent([
+                    'id' => $quizz->id,
+                    'duration' => 30000
+                ]));
             }
 
             return response()->json([
@@ -50,7 +52,7 @@ class QuizzController extends DingoController {
         }
     }
 
-    public function getTracks($id) {
+    public function askTrack($id) {
         $quizz = Quizz::find($id);
 
         if ($quizz === null) {
@@ -64,13 +66,26 @@ class QuizzController extends DingoController {
         $track = $tracks[0];
         $quizz->tracks()->attach($track['id']);
 
-        event(new QuizzSongStartedEvent([
+        event(new QuizzSongInitEvent([
             'id' => $id,
             'track' => $track
         ]));
 
         return response()->json([
             'success' => true
+        ]);
+    }
+
+    public function getQuizzData($id) {
+        $quizz = Quizz::findOrFail($id);
+        $quizz['users'] = $quizz->users()->get();
+        $quizz['tracks'] = $quizz->tracks()->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'quizz' => $quizz
+            ]
         ]);
     }
 

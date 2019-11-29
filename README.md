@@ -88,7 +88,9 @@ Front :
 ### Rejoindre un quizz
 
 #### ***POST*** /api/quizz
-Créer ou trouve un quizz en cours en fonction du genre. Renvoie le quizz
+- Vérifie si un quizz existe pour le genre donné
+- Si aucune quizz n'a été trouvé un nouveau quizz va être crée et un événement QuizzStartedEvent est lancé contenant une duration de 30sec. 
+- Si un quizz existe déja pour ce genre et à le status à true alors le quizz est renvoyé.
 
 | Name | Located in | Required | Schema |
 | ---- | ---------- | -------- | ---- |
@@ -96,8 +98,8 @@ Créer ou trouve un quizz en cours en fonction du genre. Renvoie le quizz
 
 ---
 
-#### ***GET*** /api/quizz/{id}/tracks
-Récupere 1 track aléatoires en fonction du genre du quizz puis lance l'event QuizzSongStartedEvent
+#### ***GET*** /api/quizz/{id}/getTrack
+Récupere une track aléatoire en fonction du genre du quizz puis lance l'event QuizzSongInitEvent
 
 ---
 

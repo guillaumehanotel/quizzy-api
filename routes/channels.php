@@ -27,8 +27,9 @@ Broadcast::channel('quizz-{id}', function ($user, $id) {
         $quizz->users()->attach((int)$user->id);
     }
 
+    $user['score'] = $quizzUsers[0];
 
     return [
-        'user' => $user
+        'user' => $user,
     ];
 });
