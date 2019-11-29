@@ -27,6 +27,7 @@ Broadcast::channel('quizz-{id}', function ($user, $id) {
         $quizz->users()->attach((int)$user->id);
     }
 
+
     return [
         'user' => $user
     ];

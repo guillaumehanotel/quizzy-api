@@ -4,6 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class Track
+ * @package App\Models
+ * @property Artist artist
+ */
 class Track extends Model {
 
     protected $fillable = [
@@ -18,6 +23,10 @@ class Track extends Model {
 
     public function quizzs() {
         return $this->belongsToMany('App\Models\Quizz');
+    }
+
+    public function artist() {
+        return $this->belongsTo('App\Models\Artist');
     }
 
 }
