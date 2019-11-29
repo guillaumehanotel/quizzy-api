@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Events\QuizzStartedEvent;
+use App\Events\QuizzSongStartedEvent;
 use App\Http\Transformers\TrackTransformer;
 use App\Models\Genre;
 use App\Models\Quizz;
+use App\Models\Track;
 use App\Services\MusicService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -60,10 +61,12 @@ class QuizzController extends DingoController {
         }
 
         $tracks = $this->musicService->getRandomMusicByGenreId(1, $quizz->genre_id);
+        $track = $tracks[0];
+        $quizz->tracks()->attach($track['id']);
 
-        event(new QuizzStartedEvent([
+        event(new QuizzSongStartedEvent([
             'id' => $id,
-            'tracks' => $tracks
+            'track' => $track
         ]));
 
         return response()->json([

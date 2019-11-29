@@ -11,7 +11,7 @@ class Quizz extends Model {
     }
 
     public function tracks() {
-        return $this->belongsToMany('App\Models\Track', 'quizzs_users');
+        return $this->belongsToMany('App\Models\Track', 'quizzs_tracks');
     }
 
     public function genre() {
