@@ -97,7 +97,7 @@ Créer ou trouve un quizz en cours en fonction du genre. Renvoie le quizz
 ---
 
 #### ***GET*** /api/quizz/{id}/tracks
-Récupere 10 tracks aléatoires en fonction du genre du quizz
+Récupere 1 track aléatoires en fonction du genre du quizz puis lance l'event QuizzSongStartedEvent
 
 ---
 

@@ -9,7 +9,6 @@ $api->version('v1', function ($api) {
 
     $api->group(['middleware' => 'api'], function ($api) use ($UserController, $GenreController){
 
-        // TODOS: placer les routes quizz dans le middleware auth:api
         $api->post('/quizz','App\Http\Controllers\Api\QuizzController@findOrCreate');
         $api->get('/quizz/{id}/tracks','App\Http\Controllers\Api\QuizzController@getTracks');
 

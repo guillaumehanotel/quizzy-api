@@ -23,7 +23,7 @@ class Track extends Model {
     ];
 
     public function quizzs() {
-        return $this->belongsToMany('App\Models\Quizz');
+        return $this->belongsToMany('App\Models\Quizz')->withTimestamps();
     }
 
     public function artist() {
