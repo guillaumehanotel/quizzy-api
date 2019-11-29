@@ -15,4 +15,8 @@ class Genre extends Model {
         return $this->hasMany('App\Models\Quizz');
     }
 
+    public function artists() {
+        return $this->hasMany('App\Models\Artist');
+    }
+
 }

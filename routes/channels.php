@@ -11,13 +11,11 @@ use \App\Models\Quizz;
 |
 */
 
-Broadcast::channel('quizz-{id}', function ($user, $id) {
-    $quizz = Quizz::find($id);
-    if ($quizz === null) {
-        return false;
-    }
-
-
+Broadcast::channel('room-{genreId}', function ($user, $genreId) {
+//    $quizz = Quizz::find($id);
+//    if ($quizz === null) {
+//        return false;
+//    }
 
     return [
         'name' => $user->name

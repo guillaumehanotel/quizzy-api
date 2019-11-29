@@ -1,22 +1,20 @@
 <?php
 
+use App\Http\Transformers\TrackTransformer;
+use App\Services\MusicService;
+
 $api = app('Dingo\Api\Routing\Router');
 
 $api->version('v1', function ($api) {
-
-    $UserController = 'App\Http\Controllers\Api\UserController';
-
-//    $api->get('/',  function(){
-//        event(new \App\Events\SuccessEvent([
-//            'test' => 'helloTest'
-//        ]));
-//    });
 
     $api->get('/quizz/create','App\Http\Controllers\Api\QuizzController@create');
     $api->get('/quizz/{id}','App\Http\Controllers\Api\QuizzController@emitQuizzCreated');
 
     $UserController = 'App\Http\Controllers\Api\UserController';
     $GenreController = 'App\Http\Controllers\Api\GenreController';
+
+    $api->get('/tracks/random/{number}', 'App\Http\Controllers\Api\TrackController@getRandomTracks');
+    $api->get('/genre/{id}/tracks/random/{number}', 'App\Http\Controllers\Api\TrackController@getRandomTracksByGenre');
 
     $api->group(['middleware' => 'api'], function ($api) use ($UserController, $GenreController){
 

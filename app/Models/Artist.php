@@ -11,5 +11,12 @@ class Artist extends Model {
         'picture_url'
     ];
 
+    public function tracks() {
+        return $this->hasMany('App\Models\Track');
+    }
+
+    public function genre() {
+        return $this->belongsTo('App\Models\Genre');
+    }
 
 }
