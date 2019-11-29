@@ -10,14 +10,14 @@ $api->version('v1', function ($api) {
     $api->group(['middleware' => 'api'], function ($api) use ($UserController, $GenreController){
 
         // TODOS: placer les routes quizz dans le middleware auth:api
-        $api->post('/quizz/{id}','App\Http\Controllers\Api\QuizzController@findOrCreate');
+        $api->post('/quizz','App\Http\Controllers\Api\QuizzController@findOrCreate');
+        $api->get('/quizz/{id}/tracks','App\Http\Controllers\Api\QuizzController@getTracks');
 
         $api->post("register", 'App\Http\Controllers\Api\Auth\RegisterController@register');
         $api->post("login", 'App\Http\Controllers\Api\Auth\LoginController@login')->name('login');
 
         $api->get('/users/google/{google_uid}', $UserController . '@showByGoogleUid')->name('users.google.show');
         $api->post('/users', $UserController . '@store')->name('users.store');
-
 
         $api->get('genres', $GenreController . '@index')->name('genres.index');
 

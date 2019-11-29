@@ -2,25 +2,21 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Events\QuizzUserJoinedEvent;
-use App\Http\Controllers\Controller;
-use App\Http\Transformers\UserTransformer;
+use App\Events\QuizzStartedEvent;
 use App\Models\Genre;
 use App\Models\Quizz;
-use Dingo\Api\Http\Response;
 use Illuminate\Http\Request;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use \App\Events\QuizzCreatedEvent;
 use Illuminate\Support\Facades\DB;
 
 class QuizzController extends DingoController {
+    public function __construct() {
+        $this->table = 'quizzs';
+    }
 
-    public function findOrCreate(Request $request, $id) {
+    public function findOrCreate(Request $request) {
         try {
             $genreId = $request->json()->get('genre_id');
-            $quizz = DB::table('quizzs')
-                ->where('id', '=', $id)
+            $quizz = DB::table($this->table)
                 ->where('genre_id', '=', $genreId)
                 ->where('status', '=', 1)
                 ->get();
@@ -44,6 +40,30 @@ class QuizzController extends DingoController {
                 'error' => $e
             ]);
         }
+    }
+
+    public function getTracks($id) {
+        $quizz = Quizz::find($id);
+
+        // récupérer des tracks random en fonction du genre id
+        $tracks = [];
+//        $tracks = DB::table('tracks')
+//            ->leftJoin('artists', 'artists.id', '=', 'tracks.artist_id')
+//            ->leftJoin('genres', 'genres.id', '=', 'artists.genre_id')
+//            ->where('genres.id', '=', $quizz->genre_id)
+//            ->get();
+
+        event(new QuizzStartedEvent([
+            'id' => $id,
+            'tracks' => $tracks
+        ]));
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'tracks' => $tracks
+            ]
+        ]);
     }
 
 }

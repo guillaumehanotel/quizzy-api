@@ -87,14 +87,25 @@ Front :
 
 ### Rejoindre un quizz
 
-#### Partie privée
+#### /api/quizz
+Créer ou trouve un quizz en cours en fonction du genre. Renvoie le quizz
 
-- Créer une partie en tapant sur la route /api/quizz/create en post et en passant un parametre un objet genre avec son id
+##### ***POST***
 
-- Partager le lien de la partie pour que les autres utilisateurs puissent rejoindre la partie
+| Name | Located in | Required | Schema |
+| ---- | ---------- | -------- | ---- |
+| genre_id | body | Yes | int |
 
-- Ecouter l'évenement QuizzUserJoinedEvent qui se déclenche lorsqu'un utilisateur rejoint une partie
+---
 
-- Lorsque la partie est prête à démarrer envoyer une requête depuis le front qui declenchera un événement QuizzStartedEvent
+#### /api/quizz/{id}/tracks
+Récupere 10 tracks aléatoires en fonction du genre du quizz
+##### ***GET***
+
+| Name | Located in | Required | Schema |
+| ---- | ---------- | -------- | ---- |
+| genre_id | body | Yes | int |
+
+---
 
 https://github.com/mpociot/laravel-apidoc-generator
