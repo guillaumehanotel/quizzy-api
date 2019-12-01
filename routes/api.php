@@ -12,18 +12,18 @@ $api->version('v1', function ($api) {
 //        ]));
 //    });
 
-    $api->get('/quizz/create','App\Http\Controllers\Api\QuizzController@create');
-    $api->get('/quizz/{id}','App\Http\Controllers\Api\QuizzController@emitQuizzCreated');
+    $api->get('/quizz/create', 'App\Http\Controllers\Api\QuizzController@create');
+    $api->get('/quizz/{id}', 'App\Http\Controllers\Api\QuizzController@emitQuizzCreated');
 
     $UserController = 'App\Http\Controllers\Api\UserController';
     $GenreController = 'App\Http\Controllers\Api\GenreController';
 
-    $api->group(['middleware' => 'api'], function ($api) use ($UserController, $GenreController){
+    $api->group(['middleware' => 'api'], function ($api) use ($UserController, $GenreController) {
 
         // TODOS: placer les routes quizz dans le middleware auth:api
-        $api->post('/quizz/create','App\Http\Controllers\Api\QuizzController@create');
-        $api->post('/quizz/{id}/user/add','App\Http\Controllers\Api\QuizzController@addUserToQuizz');
-        $api->get('/quizz/{id}','App\Http\Controllers\Api\QuizzController@get');
+        $api->post('/quizz/create', 'App\Http\Controllers\Api\QuizzController@create');
+        $api->post('/quizz/{id}/user/add', 'App\Http\Controllers\Api\QuizzController@addUserToQuizz');
+        $api->get('/quizz/{id}', 'App\Http\Controllers\Api\QuizzController@get');
 
         $api->post("register", 'App\Http\Controllers\Api\Auth\RegisterController@register');
         $api->post("login", 'App\Http\Controllers\Api\Auth\LoginController@login')->name('login');
@@ -33,6 +33,7 @@ $api->version('v1', function ($api) {
 
 
         $api->get('genres', $GenreController . '@index')->name('genres.index');
+        $api->get('genre/{id}', $GenreController . '@show');
 
         /*
         $api->get("register/{token}", 'App\Http\Controllers\Api\Auth\RegisterController@registerActivate');
@@ -43,7 +44,7 @@ $api->version('v1', function ($api) {
     });
 
     // Protected routes
-    $api->group(['middleware' => 'auth:api'], function ($api) use ($UserController){
+    $api->group(['middleware' => 'auth:api'], function ($api) use ($UserController) {
 
         $api->get('me', 'App\Http\Controllers\Api\UserController@me');
         $api->get('logout', 'App\Http\Controllers\Api\Auth\LoginController@logout');

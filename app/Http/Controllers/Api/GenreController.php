@@ -13,4 +13,8 @@ class GenreController extends DingoController {
         return $this->response->collection($genres, new GenreTransformer());
     }
 
+    public function show($id) {
+        $genre = Genre::findOrFail($id);
+        return $genre;
+    }
 }
