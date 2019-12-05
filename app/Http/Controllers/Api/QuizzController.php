@@ -34,7 +34,8 @@ class QuizzController extends DingoController {
 
         event(new QuizzSongInitEvent([
             'id' => $genreId,
-            'track' => $track
+            'track' => $track,
+            'waitingTime' => 10
         ]));
 
         return response()->json([
