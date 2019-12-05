@@ -19,7 +19,6 @@ $api->version('v1', function ($api) {
         $api->post('/users', $UserController . '@store')->name('users.store');
 
         $api->get('genres', $GenreController . '@index')->name('genres.index');
-
         /*
         $api->get("register/{token}", 'App\Http\Controllers\Api\Auth\RegisterController@registerActivate');
         $api->post("password/email", 'App\Http\Controllers\Api\V1\Auth\PasswordResetController@createToken');
@@ -40,4 +39,3 @@ $api->version('v1', function ($api) {
     });
 
 });
-
