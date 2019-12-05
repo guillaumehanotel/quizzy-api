@@ -17,8 +17,9 @@ class QuizzController extends DingoController {
         $this->musicService = new MusicService();
     }
 
-    public function askTrack($id) {
-        $quizz = Quizz::find($id);
+    public function askTrack($genreId) {
+        $quizz = Quizz::where('genre_id', $genreId)
+            ->where('status', 1)->first();
 
         if ($quizz === null) {
             return response()->json([
@@ -32,7 +33,7 @@ class QuizzController extends DingoController {
         $quizz->tracks()->attach($track['id']);
 
         event(new QuizzSongInitEvent([
-            'id' => $id,
+            'id' => $genreId,
             'track' => $track
         ]));
 
@@ -52,6 +53,11 @@ class QuizzController extends DingoController {
                 'quizz' => $quizz
             ]
         ]);
+    }
+
+    public function postUserResponse($id) {
+        $quizz = Quizz::findOrFail($id);
+
     }
 
 }
