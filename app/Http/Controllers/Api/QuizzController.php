@@ -11,45 +11,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class QuizzController extends DingoController {
-    private $table;
     private $musicService;
 
     public function __construct() {
-        $this->table = 'quizzs';
         $this->musicService = new MusicService();
-    }
-
-    public function findOrCreate(Request $request) {
-        try {
-            $genreId = $request->json()->get('genre_id');
-            $quizz = DB::table($this->table)
-                ->where('genre_id', '=', $genreId)
-                ->where('status', '=', 1)
-                ->get();
-
-            if (count($quizz) === 0) {
-                $genre = Genre::findOrFail( (int)$genreId );
-                $quizz = new Quizz();
-                $quizz->genre()->associate($genre);
-                $quizz->save();
-                event(new QuizzStartedEvent([
-                    'id' => $quizz->id,
-                    'duration' => 30000
-                ]));
-            }
-
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'quizz' => $quizz,
-                ]
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'error' => $e
-            ]);
-        }
     }
 
     public function askTrack($id) {

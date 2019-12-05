@@ -1,6 +1,5 @@
 <?php
-use \App\Models\Quizz;
-use \Illuminate\Support\Facades\DB;
+use \App\Services\QuizzService;
 /*
 |--------------------------------------------------------------------------
 | Broadcast Channels
@@ -12,24 +11,10 @@ use \Illuminate\Support\Facades\DB;
 |
 */
 
-Broadcast::channel('quizz-{id}', function ($user, $id) {
-    $quizz = Quizz::find($id);
-    if ($quizz === null) {
-        return false;
-    }
-
-    $quizzUsers = DB::table('quizzs_users')
-        ->where('user_id', '=', $user->id)
-        ->where('quizz_id', '=', $id)
-        ->get();
-
-    if (count($quizzUsers) === 0) {
-        $quizz->users()->attach((int)$user->id);
-    }
-
-    $user['score'] = $quizzUsers[0];
+Broadcast::channel('quizz-{id}', function ($user, $genreId) {
+    $quizzService = new QuizzService();
 
     return [
-        'user' => $user,
+        'user' => $quizzService->getUser($genreId, $user),
     ];
 });
