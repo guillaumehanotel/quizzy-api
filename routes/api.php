@@ -6,6 +6,7 @@ $api->version('v1', function ($api) {
 
     $UserController = 'App\Http\Controllers\Api\UserController';
     $GenreController = 'App\Http\Controllers\Api\GenreController';
+    $QuizzController = 'App\Http\Controllers\Api\QuizzController';
 
     $api->group(['middleware' => 'api'], function ($api) use ($UserController, $GenreController){
 
@@ -20,16 +21,10 @@ $api->version('v1', function ($api) {
 
         $api->get('genres', $GenreController . '@index')->name('genres.index');
 
-        /*
-        $api->get("register/{token}", 'App\Http\Controllers\Api\Auth\RegisterController@registerActivate');
-        $api->post("password/email", 'App\Http\Controllers\Api\V1\Auth\PasswordResetController@createToken');
-        $api->get("password/reset/{token}", 'App\Http\Controllers\Api\V1\Auth\PasswordResetController@findToken');
-        $api->post("password/reset", 'App\Http\Controllers\Api\V1\Auth\PasswordResetController@reset');
-        */
     });
 
     // Protected routes
-    $api->group(['middleware' => 'auth:api'], function ($api) use ($UserController){
+    $api->group(['middleware' => 'auth:api'], function ($api) use ($UserController) {
 
         $api->get('me', 'App\Http\Controllers\Api\UserController@me');
         $api->get('logout', 'App\Http\Controllers\Api\Auth\LoginController@logout');

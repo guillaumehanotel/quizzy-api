@@ -17,24 +17,16 @@ class QuizzController extends DingoController {
         $this->musicService = new MusicService();
     }
 
-    public function askTrack($id) {
-        $quizz = Quizz::find($id);
+    public function askTrack($genreId) {
 
-        if ($quizz === null) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No quizz found'
-            ]);
-        }
+        $quizz = Quizz::where('genre_id', $genreId)
+                      ->where('status', 1)
+                      ->first();
 
-        $tracks = $this->musicService->getRandomMusicByGenreId(1, $quizz->genre_id);
-        $track = $tracks[0];
+        if($quizz == null) throw new \Exception("A quizz should have been created before");
+
+        $track = $this->musicService->getRandomMusicByGenreId(1, $genreId)[0];
         $quizz->tracks()->attach($track['id']);
-
-        event(new QuizzSongInitEvent([
-            'id' => $id,
-            'track' => $track
-        ]));
 
         return response()->json([
             'success' => true

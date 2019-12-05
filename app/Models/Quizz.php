@@ -4,6 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class Quizz
+ * @package App\Models
+ * @mixin \Eloquent
+ */
 class Quizz extends Model {
 
     public function users() {
