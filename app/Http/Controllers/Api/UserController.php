@@ -3,14 +3,19 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Transformers\UserTransformer;
+use App\Services\StatService;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Validator;
 use Illuminate\Support\Str;
 
 
 class UserController extends DingoController {
+    private $statService;
+
+    public function __construct() {
+        $this->statService = new StatService();
+    }
 
     public function me() {
         return $this->response->item(Auth::user(), new UserTransformer());
@@ -65,6 +70,14 @@ class UserController extends DingoController {
             ->setStatusCode(201)
             ->setMeta($meta);
         return $response;
+    }
+
+    public function getStats($id) {
+        $stats = $this->statService->getStats($id);
+        return response()->json([
+            'success' => true,
+            'data' => $stats
+        ]);
     }
 
 }
