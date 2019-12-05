@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Events\QuizzSongInitEvent;
+use App\Events\QuizzSongStartEvent;
 use App\Events\QuizzStartedEvent;
 use App\Models\Genre;
 use App\Models\Quizz;
@@ -20,13 +21,21 @@ class QuizzController extends DingoController {
     public function askTrack($genreId) {
 
         $quizz = Quizz::where('genre_id', $genreId)
-                      ->where('status', 1)
+                      ->where('is_active', 1)
                       ->first();
 
-        if($quizz == null) throw new \Exception("A quizz should have been created before");
+        if ($quizz === null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No quizz found'
+            ]);
+        }
 
-        $track = $this->musicService->getRandomMusicByGenreId(1, $genreId)[0];
+        $tracks = $this->musicService->getRandomMusicByGenreId(1, $quizz->genre_id);
+        $track = $tracks[0];
         $quizz->tracks()->attach($track['id']);
+
+        event(new QuizzSongStartEvent($genreId, $track));
 
         return response()->json([
             'success' => true
@@ -44,6 +53,11 @@ class QuizzController extends DingoController {
                 'quizz' => $quizz
             ]
         ]);
+    }
+
+    public function postUserResponse($id) {
+        $quizz = Quizz::findOrFail($id);
+
     }
 
 }
