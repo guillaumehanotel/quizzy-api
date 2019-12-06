@@ -8,7 +8,7 @@ $api->version('v1', function ($api) {
     $GenreController = 'App\Http\Controllers\Api\GenreController';
     $QuizzController = 'App\Http\Controllers\Api\QuizzController';
 
-    $api->group(['middleware' => 'api'], function ($api) use ($UserController, $GenreController){
+    $api->group(['middleware' => ['api', 'cors']], function ($api) use ($UserController, $GenreController){
 
         $api->get('/quizz/{id}','App\Http\Controllers\Api\QuizzController@getQuizzData');
         $api->get('/quizz/{genreId}/askTrack','App\Http\Controllers\Api\QuizzController@askTrack');
@@ -20,6 +20,7 @@ $api->version('v1', function ($api) {
         $api->post('/users', $UserController . '@store')->name('users.store');
 
         $api->get('genres', $GenreController . '@index')->name('genres.index');
+        $api->get('genres/{id}', $GenreController . '@show')->name('genres.show');
 
     });
 

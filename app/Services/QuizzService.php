@@ -8,10 +8,22 @@ use Illuminate\Support\Facades\DB;
 
 class QuizzService {
 
+    private $musicService;
+
+    public function __construct(MusicService $musicService) {
+        $this->musicService = $musicService;
+    }
+
+    public function addRandomMusicToQuizz($quizz) {
+        $track = $this->musicService->getRandomMusicByGenreId(1, $quizz->genre_id)[0];
+        $quizz->tracks()->attach($track['id']);
+        return $track;
+    }
+
     public function getOrCreateQuizz($genreId) {
         $quizz = DB::table('quizzs')
             ->where('genre_id', '=', $genreId)
-            ->where('status', '=', 1)
+            ->where('is_active', '=', 1)
             ->get();
 
         if (count($quizz) === 0) {

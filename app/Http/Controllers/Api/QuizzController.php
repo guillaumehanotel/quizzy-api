@@ -4,42 +4,43 @@ namespace App\Http\Controllers\Api;
 
 use App\Events\QuizzSongInitEvent;
 use App\Events\QuizzSongStartEvent;
-use App\Events\QuizzStartedEvent;
-use App\Models\Genre;
+use App\Jobs\OpenQuizzListening;
 use App\Models\Quizz;
 use App\Services\MusicService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Services\QuizzService;
 
 class QuizzController extends DingoController {
-    private $musicService;
 
-    public function __construct() {
-        $this->musicService = new MusicService();
+    private $quizzService;
+
+    public function __construct(QuizzService $quizzService) {
+        $this->quizzService = $quizzService;
     }
 
     public function askTrack($genreId) {
 
+        /** @var Quizz $quizz */
         $quizz = Quizz::where('genre_id', $genreId)
                       ->where('is_active', 1)
                       ->first();
 
+
         if ($quizz === null) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No quizz found'
-            ]);
+            return $this->response->errorNotFound("No quizz found");
         }
 
-        $tracks = $this->musicService->getRandomMusicByGenreId(1, $quizz->genre_id);
-        $track = $tracks[0];
-        $quizz->tracks()->attach($track['id']);
+        if($quizz->is_listening == true) {
 
-        event(new QuizzSongStartEvent($genreId, $track));
+            $quizz->closeListening();
+            $track = $this->quizzService->addRandomMusicToQuizz($quizz);
+            event(new QuizzSongStartEvent($genreId, $track));
+            OpenQuizzListening::dispatch($quizz)->delay(now()->addSecond());
 
-        return response()->json([
-            'success' => true
-        ]);
+            return $this->response->noContent();
+
+        } else {
+            return $this->response->error("The quizz isn't listening", 500);
+        }
     }
 
     public function getQuizzData($id) {

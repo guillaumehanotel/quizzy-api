@@ -4,6 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class Artist
+ * @package App\Models
+ * @property string name
+ */
 class Artist extends Model {
 
     protected $fillable = [
