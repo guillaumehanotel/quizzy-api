@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Events;
+
+use App\Models\Track;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -10,34 +12,22 @@ use Illuminate\Queue\SerializesModels;
 
 class QuizzSongEndEvent implements ShouldBroadcast {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-    public $params = [];
-    /**
-     * Create a new event instance.
-     *
-     * @return void
-     */
-    public function __construct($params)
-    {
-        $this->params = $params;
+
+    public $track;
+    public $genreId;
+
+    public function __construct($genreId, Track $track) {
+        $this->track = $track;
+        $this->genreId = $genreId;
     }
-    /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return \Illuminate\Broadcasting\Channel|array
-     */
-    public function broadcastOn()
-    {
-        return new PresenceChannel('quizz-' . (int)$this->params['id']);
+
+    public function broadcastOn() {
+        return new PresenceChannel('quizz-' . (int)$this->genreId);
     }
-    /**
-     * Get the data to broadcast.
-     *
-     * @return array
-     */
-    public function broadcastWith()
-    {
+
+    public function broadcastWith() {
         return [
-            'song' => $this->params['track']['preview_url']
+            'track' => $this->track->preview_url
         ];
     }
 

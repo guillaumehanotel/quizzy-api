@@ -15,7 +15,7 @@ class MusicPopularityFetcher {
         $this->client = new Client();
     }
 
-    public function scrapTacksPopularity() {
+    public function scrapTracksPopularity() {
         $tracks = Track::whereNull('youtube_view')->get();
         foreach ($tracks as $track) {
             $this->getYoutubeViewNumber($track);

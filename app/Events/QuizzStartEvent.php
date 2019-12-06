@@ -8,7 +8,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
 
-class QuizzStartedEvent implements ShouldBroadcast {
+class QuizzStartEvent implements ShouldBroadcast {
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public $params = [];
     /**

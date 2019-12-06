@@ -4,18 +4,15 @@ namespace App\Events;
 
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class QuizzSongStartEvent implements ShouldBroadcast {
+class QuizzEndEvent {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $track;
     public $genreId;
 
-    public function __construct($genreId, $track) {
-        $this->track = $track;
+    public function __construct($genreId) {
         $this->genreId = $genreId;
     }
 
@@ -25,8 +22,7 @@ class QuizzSongStartEvent implements ShouldBroadcast {
 
     public function broadcastWith() {
         return [
-            'track' => $this->track['preview_url']
+            'duration' => 30
         ];
     }
-
 }

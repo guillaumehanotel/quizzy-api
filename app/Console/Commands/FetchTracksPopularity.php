@@ -19,6 +19,6 @@ class FetchTracksPopularity extends Command {
     }
 
     public function handle() {
-        $this->musicPopularityFetcher->scrapTacksPopularity();
+        $this->musicPopularityFetcher->scrapTracksPopularity();
     }
 }
