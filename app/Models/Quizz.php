@@ -3,12 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 
 /**
  * Class Quizz
  * @package App\Models
  * @property bool is_listening
  * @property bool is_active
+ * @property Track[] tracks
+ * @property User[]|Collection users
+ * @property Genre genre
  * @mixin \Eloquent
  */
 class Quizz extends Model {
@@ -38,6 +42,19 @@ class Quizz extends Model {
 
     public function openListening() {
         $this->is_listening = true;
+        $this->save();
+    }
+
+    public function hasNoTracks() {
+        return count($this->tracks) == 0;
+    }
+
+    public function hasReached10Tracks() {
+        return count($this->tracks) == 10;
+    }
+
+    public function disable() {
+        $this->is_active = false;
         $this->save();
     }
 

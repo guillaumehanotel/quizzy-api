@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\QuizzEndEvent;
+use App\Events\QuizzSongEndEvent;
 use App\Events\QuizzSongInitEvent;
 use App\Events\QuizzSongStartEvent;
 use App\Jobs\OpenQuizzListening;
@@ -24,22 +26,37 @@ class QuizzController extends DingoController {
                       ->where('is_active', 1)
                       ->first();
 
-
         if ($quizz === null) {
             return $this->response->errorNotFound("No quizz found");
         }
 
-        if($quizz->is_listening == true) {
-
+        if ($quizz->is_listening == true) {
             $quizz->closeListening();
-            $track = $this->quizzService->addRandomMusicToQuizz($quizz);
-            event(new QuizzSongStartEvent($genreId, $track));
-            OpenQuizzListening::dispatch($quizz)->delay(now()->addSecond());
 
-            return $this->response->noContent();
+            if (!$quizz->hasNoTracks()) {
+                $track = $this->quizzService->getLastQuizzTrack($quizz);
+                event(new QuizzSongEndEvent($genreId, $track));
+
+                if ($quizz->hasReached10Tracks()) {
+                    $quizz->disable();
+                    $this->quizzService->createQuizzWithGenreAndUsers($genreId, $quizz->users);
+                    event(new QuizzEndEvent($genreId));
+                }
+            }
+
+            if (!$quizz->hasReached10Tracks()) {
+                $track = $this->quizzService->selectQuizzNewTrack($quizz);
+                event(new QuizzSongStartEvent($genreId, $track));
+            }
+
+            OpenQuizzListening::dispatch($quizz)->delay(now()->addSecond());
+            return $this->response()->json([
+                'success' => true,
+                'message' => 'askTrack successfully processed'
+            ]);
 
         } else {
-            return $this->response->error("The quizz isn't listening", 500);
+            return $this->response->noContent();
         }
     }
 

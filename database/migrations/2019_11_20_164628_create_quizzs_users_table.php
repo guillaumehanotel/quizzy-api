@@ -10,8 +10,8 @@ class CreateQuizzsUsersTable extends Migration {
         Schema::create('quizzs_users', function (Blueprint $table) {
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('quizz_id');
-            $table->boolean('winner')->default(false);;
-            $table->bigInteger('points')->default(0);;
+            $table->boolean('winner')->default(false);
+            $table->bigInteger('points')->default(0);
             $table->timestamps();
         });
     }

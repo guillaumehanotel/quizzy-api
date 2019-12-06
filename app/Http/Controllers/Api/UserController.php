@@ -31,7 +31,11 @@ class UserController extends DingoController {
         if (empty($user)) {
             return $this->response->errorNotFound("No user with Google UID : " . $googleUid);
         } else {
-            $token = $user->createToken(Str::random(32))->accessToken;
+            try {
+                $token = $user->createToken(Str::random(32))->accessToken;
+            } catch (\Exception $exception) {
+                $this->response->errorInternal("No passport client tokens found");
+            }
             $meta = [
                 'access_token' => $token,
                 'token_type' => 'bearer'

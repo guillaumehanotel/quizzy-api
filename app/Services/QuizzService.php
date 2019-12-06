@@ -1,10 +1,13 @@
 <?php
+
 namespace App\Services;
 
-use App\Jobs\StartQuizz;
+use App\Jobs\LaunchStartQuizzEvent;
 use App\Models\Genre;
 use App\Models\Quizz;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class QuizzService {
@@ -15,50 +18,52 @@ class QuizzService {
         $this->musicService = new MusicService();
     }
 
-    public function addRandomMusicToQuizz($quizz) {
+    public function selectQuizzNewTrack($quizz) {
         $track = $this->musicService->getRandomMusicByGenreId(1, $quizz->genre_id)[0];
         $quizz->tracks()->attach($track['id']);
         return $track;
     }
 
-    public function getOrCreateQuizz($genreId) {
-        $quizz = DB::table('quizzs')
-            ->where('genre_id', '=', $genreId)
-            ->where('is_active', '=', 1)
-            ->get();
+    public function getOrCreateQuizzByGenre($genreId) {
+        $quizz = Quizz::where('genre_id', $genreId)->where('is_active', true)->first();
 
-        if (count($quizz) === 0) {
-            $genre = Genre::findOrFail($genreId);
-            $quizz = new Quizz();
-            $quizz->genre()->associate($genre);
-            $quizz->save();
-            StartQuizz::dispatch($genreId, 30000)->delay(Carbon::now()->addSecond());
-        } else {
-            $quizz = Quizz::find($quizz[0]->id);
+        if ($quizz == null) {
+            $quizz = $this->createQuizzWithGenre($genreId);
+            LaunchStartQuizzEvent::dispatch($genreId, 30000)->delay(Carbon::now()->addSecond());
         }
-
         return $quizz;
     }
 
-    public function getOrCreateQuizzUser($user, $quizz) {
-        $quizzUsers = DB::table('quizzs_users')
+    public function createQuizzWithGenre($genreId): Quizz {
+        $genre = Genre::findOrFail($genreId);
+        $quizz = new Quizz();
+        $quizz->genre()->associate($genre);
+        $quizz->save();
+        return $quizz;
+    }
+
+    public function createQuizzWithGenreAndUsers($genreId, Collection $users) {
+        $quizz = $this->createQuizzWithGenre($genreId);
+        $quizz->users()->sync($users->map(function ($user) {
+            return $user->id;
+        }));
+        return $quizz;
+    }
+
+    public function addOrRetrieveUserByQuizz($user, Quizz $quizz) {
+        $quizzUser = DB::table('quizzs_users')
             ->where('user_id', '=', $user->id)
             ->where('quizz_id', '=', $quizz->id)
-            ->get();
-
-        if (count($quizzUsers) === 0) {
+            ->first();
+        if ($quizzUser == null) {
             $quizz->users()->attach((int)$user->id);
-            $user['score'] = 0;
-        } else {
-            $user['score'] = $quizzUsers[0]->points;
         }
-
+        $user['score'] = $quizzUser->points;
         return $user;
     }
 
-    public function getUser($genreId, $user) {
-        $quizz = $this->getOrCreateQuizz($genreId);
-        return $this->getOrCreateQuizzUser($user, $quizz);
+    public function getLastQuizzTrack(Quizz $quizz) {
+        return $quizz->tracks()->orderBy('created_at')->first();
     }
 
 }
