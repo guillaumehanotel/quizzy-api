@@ -27,7 +27,7 @@ class MusicService {
         /** @var Artist $artist */
         foreach ($artists as $artist) {
             array_push($tracks, ($artist->tracks()->inRandomOrder()->first())->toArray());
-        };
+        }
         return $tracks;
     }
 

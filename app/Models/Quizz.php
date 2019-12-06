@@ -4,6 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class Quizz
+ * @package App\Models
+ * @property bool is_listening
+ * @property bool is_active
+ * @mixin \Eloquent
+ */
 class Quizz extends Model {
 
     public function users() {
@@ -23,4 +30,15 @@ class Quizz extends Model {
     public function genre() {
         return $this->belongsTo('App\Models\Genre');
     }
+
+    public function closeListening() {
+        $this->is_listening = false;
+        $this->save();
+    }
+
+    public function openListening() {
+        $this->is_listening = true;
+        $this->save();
+    }
+
 }
