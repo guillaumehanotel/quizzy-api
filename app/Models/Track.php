@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Model;
  * Class Track
  * @package App\Models
  * @property Artist artist
+ * @property int id
  * @property string title
+ * @property string full_title
  */
 class Track extends Model {
 

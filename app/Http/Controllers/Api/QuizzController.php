@@ -8,7 +8,7 @@ use App\Events\QuizzSongInitEvent;
 use App\Events\QuizzSongStartEvent;
 use App\Jobs\OpenQuizzListening;
 use App\Models\Quizz;
-use App\Services\MusicService;
+use App\Services\TrackService;
 use App\Services\QuizzService;
 
 class QuizzController extends DingoController {
@@ -33,21 +33,7 @@ class QuizzController extends DingoController {
         if ($quizz->is_listening == true) {
             $quizz->closeListening();
 
-            if (!$quizz->hasNoTracks()) {
-                $track = $this->quizzService->getLastQuizzTrack($quizz);
-                event(new QuizzSongEndEvent($genreId, $track));
-
-                if ($quizz->hasReached10Tracks()) {
-                    $quizz->disable();
-                    $this->quizzService->createQuizzWithGenreAndUsers($genreId, $quizz->users);
-                    event(new QuizzEndEvent($genreId));
-                }
-            }
-
-            if (!$quizz->hasReached10Tracks()) {
-                $track = $this->quizzService->selectQuizzNewTrack($quizz);
-                event(new QuizzSongStartEvent($genreId, $track));
-            }
+            $this->quizzService->launchNextQuizzAction($quizz);
 
             OpenQuizzListening::dispatch($quizz)->delay(now()->addSecond());
             return $this->response()->json([

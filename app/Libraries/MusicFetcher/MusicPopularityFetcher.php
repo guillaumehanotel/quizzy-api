@@ -40,7 +40,7 @@ class MusicPopularityFetcher {
         }
     }
 
-    public function getPageUrl($track) {
+    public function getPageUrl(Track $track) {
         $searchTrack = str_replace(" ", "+", $track->full_title);
         return "https://www.youtube.com/results?search_query=" . $searchTrack;
     }

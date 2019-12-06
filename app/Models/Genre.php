@@ -4,6 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class Genre
+ * @package App\Models
+ * @property int id
+ */
 class Genre extends Model {
 
     protected $fillable = [
