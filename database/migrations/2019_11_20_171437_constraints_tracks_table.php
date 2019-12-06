@@ -19,8 +19,10 @@ class ConstraintsTracksTable extends Migration {
     }
 
     public function down() {
-        Schema::table('tracks', function (Blueprint $table) {
-            $table->dropForeign(['artist_id']);
-        });
+        if (Schema::hasTable('tracks')) {
+            Schema::table('tracks', function (Blueprint $table) {
+                $table->dropForeign(['artist_id']);
+            });
+        }
     }
 }

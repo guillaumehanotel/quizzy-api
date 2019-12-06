@@ -6,8 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 class ConstraintsQuizzsUsersTable extends Migration {
 
-    public function up()
-    {
+    public function up() {
         Schema::table('quizzs_users', function (Blueprint $table) {
             $table
                 ->foreign('user_id')
@@ -25,13 +24,14 @@ class ConstraintsQuizzsUsersTable extends Migration {
         });
     }
 
-    public function down()
-    {
-        Schema::table('quizzs_users', function (Blueprint $table) {
-            $table->dropForeign(['user_id']);
-        });
-        Schema::table('quizzs_users', function (Blueprint $table) {
-            $table->dropForeign(['quizz_id']);
-        });
+    public function down() {
+        if (Schema::hasTable('quizzs_users')) {
+            Schema::table('quizzs_users', function (Blueprint $table) {
+                $table->dropForeign(['user_id']);
+            });
+            Schema::table('quizzs_users', function (Blueprint $table) {
+                $table->dropForeign(['quizz_id']);
+            });
+        }
     }
 }

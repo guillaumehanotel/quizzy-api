@@ -18,8 +18,10 @@ class ConstraintsQuizzsTable extends Migration {
     }
 
     public function down() {
-        Schema::table('quizzs', function (Blueprint $table) {
-            $table->dropForeign(['genre_id']);
-        });
+        if (Schema::hasTable('quizzs')) {
+            Schema::table('quizzs', function (Blueprint $table) {
+                $table->dropForeign(['genre_id']);
+            });
+        }
     }
 }
