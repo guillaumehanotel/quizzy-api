@@ -15,7 +15,6 @@ class QuizzSongStartEvent implements ShouldBroadcast {
     public $genreId;
 
     public function __construct($genreId, $track) {
-        dump(microtime());
         $this->track = $track;
         $this->genreId = $genreId;
     }
@@ -26,7 +25,8 @@ class QuizzSongStartEvent implements ShouldBroadcast {
 
     public function broadcastWith() {
         return [
-            'track' => $this->track['preview_url']
+            'track' => $this->track['preview_url'],
+            'pauseDuration' => 10,
         ];
     }
 
