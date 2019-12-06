@@ -11,8 +11,8 @@ class QuizzService {
 
     private $musicService;
 
-    public function __construct(MusicService $musicService) {
-        $this->musicService = $musicService;
+    public function __construct() {
+        $this->musicService = new MusicService();
     }
 
     public function addRandomMusicToQuizz($quizz) {
