@@ -87,18 +87,11 @@ Front :
 
 ### Rejoindre un quizz
 
-#### ***POST*** /api/quizz
-- Vérifie si un quizz existe pour le genre donné
-- Si aucune quizz n'a été trouvé un nouveau quizz va être crée et un événement QuizzStartedEvent est lancé contenant une duration de 30sec. 
-- Si un quizz existe déja pour ce genre et à le status à true alors le quizz est renvoyé.
-
-| Name | Located in | Required | Schema |
-| ---- | ---------- | -------- | ---- |
-| genre_id | body | Yes | int |
+Pour rejoindre un quiz il suffit de se connecter au channel 'quizz-' + genreId 
 
 ---
 
-#### ***GET*** /api/quizz/{id}/getTrack
+#### ***GET*** /api/quizz/{id}/askTrack
 Récupere une track aléatoire en fonction du genre du quizz puis lance l'event QuizzSongInitEvent
 
 ---

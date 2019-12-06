@@ -32,8 +32,7 @@ $api->version('v1', function ($api) {
 
         $api->get('/users', $UserController . '@index')->name('users.index');
         $api->get('/users/{id}', $UserController . '@show')->name('users.show');
-
+        $api->get('/users/{id}/stats', $UserController . '@getStats')->name('users.getStats');
     });
 
 });
-

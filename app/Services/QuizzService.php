@@ -1,9 +1,10 @@
 <?php
 namespace App\Services;
 
-use App\Events\QuizzStartedEvent;
+use App\Jobs\StartQuizz;
 use App\Models\Genre;
 use App\Models\Quizz;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class QuizzService {
@@ -31,10 +32,7 @@ class QuizzService {
             $quizz = new Quizz();
             $quizz->genre()->associate($genre);
             $quizz->save();
-            event(new QuizzStartedEvent([
-                'id' => $quizz->id,
-                'duration' => 30000
-            ]));
+            StartQuizz::dispatch($genreId, 30000)->delay(Carbon::now()->addSecond());
         } else {
             $quizz = Quizz::find($quizz[0]->id);
         }
@@ -42,7 +40,7 @@ class QuizzService {
         return $quizz;
     }
 
-    public function getOrCreateQuizzUsers($user, $quizz) {
+    public function getOrCreateQuizzUser($user, $quizz) {
         $quizzUsers = DB::table('quizzs_users')
             ->where('user_id', '=', $user->id)
             ->where('quizz_id', '=', $quizz->id)
@@ -60,7 +58,7 @@ class QuizzService {
 
     public function getUser($genreId, $user) {
         $quizz = $this->getOrCreateQuizz($genreId);
-        return $this->getOrCreateQuizzUsers($user, $quizz);
+        return $this->getOrCreateQuizzUser($user, $quizz);
     }
 
 }
