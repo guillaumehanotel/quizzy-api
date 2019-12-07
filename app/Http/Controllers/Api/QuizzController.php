@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Events\QuizzSongInitEvent;
 use App\Jobs\OpenQuizzListening;
 use App\Models\Genre;
 use App\Models\Quizz;
+use App\Models\User;
 use App\Services\QuizzService;
+use Illuminate\Support\Facades\DB;
 
 class QuizzController extends DingoController {
 
@@ -52,9 +53,19 @@ class QuizzController extends DingoController {
         ]);
     }
 
-    public function postUserResponse($id) {
-        $quizz = Quizz::findOrFail($id);
+    public function postUserResponse(Request $request, $genreId, $userId) {
+        $body = $request->json()->all();
+        $user = User::find($userId);
+        $points = $this->quizzService->getResponseScore($genreId, $body);
+        $quizz = $this->quizzService->getQuizz($genreId);
 
+        DB::table('quizzs_users')
+            ->where('user_id', $userId)
+            ->where('quizz_id', $quizz->id)
+            ->update(['points' => 2]);
+
+        // lancer un event pour refresh le game
+        return 'updated';
     }
 
 }
