@@ -132,7 +132,7 @@ class QuizzService {
     }
 
     public function getLastQuizzTrack(Quizz $quizz): Track {
-        return $quizz->tracks()->orderBy('created_at')->first();
+        return $quizz->tracks()->orderBy('created_at', 'desc')->first();
     }
 
 }
