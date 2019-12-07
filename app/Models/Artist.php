@@ -33,7 +33,7 @@ class Artist extends Model {
             return $track->duration;
         })->sortByDesc(function (Track $track) {
             return $track->youtube_view;
-        })->take(3);
+        })->take(5);
     }
 
     public function getRandomPopularTracks() {

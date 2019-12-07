@@ -126,8 +126,10 @@ class QuizzService {
             ->first();
         if ($quizzUser == null) {
             $quizz->users()->attach((int)$user->id);
+            $user['score'] = 0;
+        } else {
+            $user['score'] = $quizzUser->points;
         }
-        $user['score'] = $quizzUser->points;
         return $user;
     }
 
