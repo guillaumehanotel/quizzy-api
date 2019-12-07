@@ -33,6 +33,10 @@ class Quizz extends Model {
             ->withTimestamps();
     }
 
+    public function lastTrack() {
+        return $this->tracks()->orderBy('quizzes_tracks.created_at', 'desc')->first();
+    }
+
     public function genre() {
         return $this->belongsTo('App\Models\Genre');
     }

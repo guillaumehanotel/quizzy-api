@@ -24,12 +24,12 @@ class QuizzService {
     /**
      * Cette fonction sert à faire avancer le quizz lorsque les clients en font la demande.
      * Selon le nombre de musique associés au quizz, on peut en déduire quelles actions doivent etre executés.
+     *
      * @param Quizz $quizz
      */
     public function launchNextQuizzAction(Quizz $quizz) {
         if (!$quizz->hasNoTracks()) {
-            $track = $this->getLastQuizzTrack($quizz);
-            event(new QuizzSongEndEvent($quizz->genre->id, $track));
+            event(new QuizzSongEndEvent($quizz->genre->id, $quizz->lastTrack()));
 
             if ($quizz->hasReached10Tracks()) {
                 $quizz->disable();
@@ -52,6 +52,7 @@ class QuizzService {
      */
     public function pickRandomTrackForQuizz(Quizz $quizz): Track {
         $track = $this->trackService->getRandomTrackByGenre($quizz->genre);
+        dump('picked track : ' . $track->title);
         $quizz->tracks()->attach($track->id);
         return $track;
     }
@@ -113,7 +114,8 @@ class QuizzService {
     }
 
     /**
-     *
+     * Récupère un user associé à un quizz avec son nb de points
+     * ou l'ajoute au quizz en initialisant son nb de points à 0
      *
      * @param $user
      * @param Quizz $quizz
@@ -131,10 +133,6 @@ class QuizzService {
             $user['score'] = $quizzUser->points;
         }
         return $user;
-    }
-
-    public function getLastQuizzTrack(Quizz $quizz): Track {
-        return $quizz->tracks()->orderBy('created_at', 'desc')->first();
     }
 
 }

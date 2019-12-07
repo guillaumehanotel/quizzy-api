@@ -40,7 +40,7 @@ php artisan passport:install
 make serve
 ```
 
-## Architecture de application Laravel
+## Architecture de l'application Laravel
 
 **/app** :  
 
