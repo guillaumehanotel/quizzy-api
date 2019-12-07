@@ -60,6 +60,7 @@ class DeezerFetcher {
                 $dbArtist->save();
 
                 foreach ($this->getTracksByArtistId($artist->id) as $track) {
+                    $track->title = trim(preg_split('/\([^)]*\)/', $track->title));
                     $dbTrack = Track::firstOrNew([
                         'title' => $track->title,
                         'album_title' => $track->album->title

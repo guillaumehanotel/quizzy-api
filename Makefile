@@ -1,4 +1,4 @@
- include .env
+include .env
 export
 .PHONY: help test serve refresh-database
 .DEFAULT_GOAL= help
@@ -9,6 +9,33 @@ help:
 serve:
 	@php artisan serve --host=lvh.me
 
+install:
+	make dependencies
+	make generate-keys
+	make refresh-database
+	make cache-clear
+
+dependencies: composer.json package.json ## Installe les dépendances PHP & JS
+	@composer install
+
+generate-keys: ## Génération des clefs secrètes
+	@php artisan key:generate
+
+database: ## Migration et population de la base de donnée
+	@php artisan migrate
+	@php artisan passport:install --force
+	@php artisan db:seed
+
 refresh-database:
 	@php artisan migrate:refresh --seed
 	@php artisan passport:install --force
+
+cache-clear:  ## Vide le cache
+	@php artisan config:cache
+	@php artisan cache:clear
+
+log-clear: ## Vide les logs
+	@echo '' > storage/logs/laravel.log
+
+tests: vendor ## Execute les tests unitaires
+	@php ./vendor/bin/phpunit

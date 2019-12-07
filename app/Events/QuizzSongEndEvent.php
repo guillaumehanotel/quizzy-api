@@ -27,7 +27,8 @@ class QuizzSongEndEvent implements ShouldBroadcast {
 
     public function broadcastWith() {
         return [
-            'track' => $this->track->preview_url
+            'artist' => $this->track->title,
+            'title' => $this->track->artist->name
         ];
     }
 

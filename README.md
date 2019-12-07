@@ -1,30 +1,68 @@
 # Quizzy API
 
-## Install
-Dupliquer le fichier .env.example et le renommer en .env. Modifier les accès à la base de donnée et ajouter une ligne 
-```
-API_PREFIX=api
-```
+Par : Guillaume HANOTEL, Arnaud LAFON, Rémi MAFAT, Simon TOULOUZE
 
-Générer une clé pour l'application
+## Prérequis
+
+- MySQL ou MariaDB
+- PHP 7.2
+- Redis 3+
+- Node 6.0+
+- make
+
+## Installation
+
+1- Créer manuellement une base de données MySQL ou MariaDB dans votre SGBD que nous nommerez 'quizzy'
+
+2- Créez un ficher d'environnement en copiant celui de l'exemple 
+```
+cp .env.example .env
+```
+3- Renseignez dans le fichier .env vos identifiants de base de donnée
+```
+DB_DATABASE=quizzy
+DB_USERNAME=yourdbuser
+DB_PASSWORD=yourdbpassword
+``` 
+4- Installez l'application avec 
+```
+make install
+```
+Cette commande aura pour effet d'éxecuter :
 ```
 php artisan key:generate
-```
-
-Pour créer les tables lancer la commande 
-```
 php artisan migrate 
-```
-
-Installer passport pour l'authentification OAuth
-```
 php artisan passport:install
 ```
 
-Lancer le serveur local
+5- Lancer le serveur local
 ```
-php artisan serve
+make serve
 ```
+
+## Architecture de application Laravel
+
+**/app** :  
+
+ - **/Console** : Là où se trouvent les commandes custom que l'on peut lancer en CLI.
+ Ici il y a 2 commandes : 
+    - FetchTracks : Tape sur l'API de Deezer pour enregistrer les genres/artistes/tracks en BDD
+    - FetchTracksPopularity : Scrape une page de recherche Youtube pour récupérer le nombre de vue en fonction d'un titre
+
+- **/Events** : Les différents évènements qui seront déclenché par l'application et retransmis au front
+en websocket. (Cf Partie 'Principe du Broadcast d'Event via WebSocket')
+
+- **/Exceptions** : Là où sont défini les Exceptions custom. Aucun Changement.
+
+- **/Http**
+
+    - **/Controllers** : Là où l'on défini les controllers de l'application.   
+    
+        Le dossier **/Auth** contient
+        les controllers d'authentification par défaut de Laravel qui ici ne sont pas utilisés.  
+        Dans le dossier **/Api**, on retrouve nos controllers utilisés par l'application.
+    
+    - **/Middleware** : 
 
 ### Principe du Broadcast d'Event via WebSocket :
 
@@ -62,15 +100,6 @@ On va publier des évènements sur Redis, et avec le serveur de websocket on va
 souscrire à ces évènements, les recevoir et les envoyer aux clients.
 
 #### Dépendances 
-
-##### Pusher :
-
-Back :  
-   - pusher/pusher-php-server
-
-Front : 
-   - laravel-echo
-   - pusher-js
 
 ##### Redis : 
 
