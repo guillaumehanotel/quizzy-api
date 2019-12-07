@@ -8,19 +8,20 @@ $api->version('v1', function ($api) {
     $GenreController = 'App\Http\Controllers\Api\GenreController';
     $QuizzController = 'App\Http\Controllers\Api\QuizzController';
 
-    $api->group(['middleware' => ['api', 'cors']], function ($api) use ($UserController, $GenreController){
-
-        $api->get('/quizz/{id}','App\Http\Controllers\Api\QuizzController@getQuizzData');
-        $api->get('/quizz/{genreId}/askTrack','App\Http\Controllers\Api\QuizzController@askTrack');
+    $api->group(['middleware' => 'api'], function ($api) use ($UserController, $GenreController, $QuizzController) {
 
         $api->post("register", 'App\Http\Controllers\Api\Auth\RegisterController@register');
         $api->post("login", 'App\Http\Controllers\Api\Auth\LoginController@login')->name('login');
+
+        // TODO should be protected
+        $api->get('/quizz/{quizz}', $QuizzController . '@getQuizzData');
+        $api->get('/quizz/{genre}/askTrack', $QuizzController . '@askTrack');
 
         $api->get('/users/google/{google_uid}', $UserController . '@showByGoogleUid')->name('users.google.show');
         $api->post('/users', $UserController . '@store')->name('users.store');
 
         $api->get('genres', $GenreController . '@index')->name('genres.index');
-        $api->get('genres/{id}', $GenreController . '@show')->name('genres.show');
+        $api->get('genres/{genre}', $GenreController . '@show')->name('genres.show');
 
     });
 
@@ -31,8 +32,8 @@ $api->version('v1', function ($api) {
         $api->get('logout', 'App\Http\Controllers\Api\Auth\LoginController@logout');
 
         $api->get('/users', $UserController . '@index')->name('users.index');
-        $api->get('/users/{id}', $UserController . '@show')->name('users.show');
-        $api->get('/users/{id}/stats', $UserController . '@getStats')->name('users.getStats');
+        $api->get('/users/{user}', $UserController . '@show')->name('users.show');
+        $api->get('/users/{user}/stats', $UserController . '@getUserStats')->name('users.getStats');
     });
 
 });

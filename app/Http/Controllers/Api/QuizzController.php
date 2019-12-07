@@ -2,13 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Events\QuizzEndEvent;
-use App\Events\QuizzSongEndEvent;
 use App\Events\QuizzSongInitEvent;
-use App\Events\QuizzSongStartEvent;
 use App\Jobs\OpenQuizzListening;
+use App\Models\Genre;
 use App\Models\Quizz;
-use App\Services\TrackService;
 use App\Services\QuizzService;
 
 class QuizzController extends DingoController {
@@ -19,12 +16,9 @@ class QuizzController extends DingoController {
         $this->quizzService = $quizzService;
     }
 
-    public function askTrack($genreId) {
+    public function askTrack(Genre $genre) {
 
-        /** @var Quizz $quizz */
-        $quizz = Quizz::where('genre_id', $genreId)
-                      ->where('is_active', 1)
-                      ->first();
+        $quizz = $this->quizzService->getActiveQuizzByGenre($genre);
 
         if ($quizz === null) {
             return $this->response->errorNotFound("No quizz found");
@@ -36,7 +30,7 @@ class QuizzController extends DingoController {
             $this->quizzService->launchNextQuizzAction($quizz);
 
             OpenQuizzListening::dispatch($quizz)->delay(now()->addSecond());
-            return $this->response()->json([
+            return $this->response->array([
                 'success' => true,
                 'message' => 'askTrack successfully processed'
             ]);
@@ -46,12 +40,11 @@ class QuizzController extends DingoController {
         }
     }
 
-    public function getQuizzData($id) {
-        $quizz = Quizz::findOrFail($id);
+    public function getQuizzData(Quizz $quizz) {
         $quizz['users'] = $quizz->users()->get();
         $quizz['tracks'] = $quizz->tracks()->get();
 
-        return response()->json([
+        return $this->response->array([
             'success' => true,
             'data' => [
                 'quizz' => $quizz

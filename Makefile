@@ -1,6 +1,6 @@
  include .env
 export
-.PHONY: help test
+.PHONY: help test serve refresh-database
 .DEFAULT_GOAL= help
 
 help:
@@ -8,3 +8,7 @@ help:
 
 serve:
 	@php artisan serve --host=lvh.me
+
+refresh-database:
+	@php artisan migrate:refresh --seed
+	@php artisan passport:install --force

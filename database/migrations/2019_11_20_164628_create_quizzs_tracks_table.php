@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 class CreateQuizzsTracksTable extends Migration {
 
     public function up() {
-        Schema::create('quizzs_tracks', function (Blueprint $table) {
+        Schema::create('quizzes_tracks', function (Blueprint $table) {
             $table->unsignedBigInteger('quizz_id');
             $table->unsignedBigInteger('track_id');
             $table->timestamps();
@@ -15,6 +15,6 @@ class CreateQuizzsTracksTable extends Migration {
     }
 
     public function down() {
-        Schema::dropIfExists('quizzs_tracks');
+        Schema::dropIfExists('quizzes_tracks');
     }
 }

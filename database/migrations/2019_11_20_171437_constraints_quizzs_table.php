@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 class ConstraintsQuizzsTable extends Migration {
 
     public function up() {
-        Schema::table('quizzs', function (Blueprint $table) {
+        Schema::table('quizzes', function (Blueprint $table) {
             $table
                 ->foreign('genre_id')
                 ->references('id')
@@ -18,8 +18,8 @@ class ConstraintsQuizzsTable extends Migration {
     }
 
     public function down() {
-        if (Schema::hasTable('quizzs')) {
-            Schema::table('quizzs', function (Blueprint $table) {
+        if (Schema::hasTable('quizzes')) {
+            Schema::table('quizzes', function (Blueprint $table) {
                 $table->dropForeign(['genre_id']);
             });
         }

@@ -17,8 +17,10 @@ use Illuminate\Support\Collection;
  */
 class Quizz extends Model {
 
+    protected $table = 'quizzes';
+
     public function users() {
-        return $this->belongsToMany('App\Models\User', 'quizzs_users')
+        return $this->belongsToMany('App\Models\User', 'quizzes_users')
             ->withTimestamps()
             ->withPivot([
                 'winner',
@@ -27,7 +29,7 @@ class Quizz extends Model {
     }
 
     public function tracks() {
-        return $this->belongsToMany('App\Models\Track', 'quizzs_tracks')
+        return $this->belongsToMany('App\Models\Track', 'quizzes_tracks')
             ->withTimestamps();
     }
 

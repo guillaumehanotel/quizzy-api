@@ -9,8 +9,10 @@ use Illuminate\Database\Eloquent\Model;
  * @package App\Models
  * @property Artist artist
  * @property int id
+ * @property int duration
  * @property string title
  * @property string full_title
+ * @property int youtube_view
  */
 class Track extends Model {
 
@@ -27,7 +29,7 @@ class Track extends Model {
 
     protected $appends = ['full_title'];
 
-    public function quizzs() {
+    public function quizzes() {
         return $this->belongsToMany('App\Models\Quizz')->withTimestamps();
     }
 

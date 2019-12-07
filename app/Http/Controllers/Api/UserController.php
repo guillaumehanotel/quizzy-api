@@ -47,8 +47,7 @@ class UserController extends DingoController {
         }
     }
 
-    public function show($id) {
-        $user = User::findOrFail($id);
+    public function show(User $user) {
         return $this->response->item($user, new UserTransformer);
     }
 
@@ -76,8 +75,8 @@ class UserController extends DingoController {
         return $response;
     }
 
-    public function getStats($id) {
-        $stats = $this->statService->getStats($id);
+    public function getUserStats(User $user) {
+        $stats = $this->statService->getStatsByUser($user);
         return response()->json([
             'success' => true,
             'data' => $stats

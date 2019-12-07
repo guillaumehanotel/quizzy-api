@@ -2,13 +2,14 @@
 namespace App\Services;
 
 use App\Models\Genre;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class StatService {
     private $table;
 
     public function __construct() {
-        $this->table = 'quizzs_users';
+        $this->table = 'quizzes_users';
     }
 
     public function getTotalGames($userId) {
@@ -44,8 +45,8 @@ class StatService {
     public function getFavoriteCategory($userId) {
         $data = DB::table($this->table)
             ->select(DB::raw('count(*) as counter'), 'genres.id', 'genres.name')
-            ->leftJoin('quizzs', 'quizzs.id', '=', $this->table . '.quizz_id')
-            ->leftJoin('genres', 'genres.id', '=', 'quizzs.genre_id')
+            ->leftJoin('quizzes', 'quizzes.id', '=', $this->table . '.quizz_id')
+            ->leftJoin('genres', 'genres.id', '=', 'quizzes.genre_id')
             ->where('user_id', '=', $userId)
             ->groupBy('genres.id', 'genres.name')
             ->get();
@@ -61,19 +62,18 @@ class StatService {
         return Genre::find($favoriteCategory);
     }
 
-    public function getStats($userId) {
-        $games = $this->getTotalGames($userId);
+    public function getStatsByUser(User $user) {
+        $games = $this->getTotalGames($user->id);
         $totalGames = count($games);
         $scores = $this->getAverageAndBestScore($games, $totalGames);
-        $wineGames = $this->getWinGames($userId);
-        $stats = [
+        $wineGames = $this->getWinGames($user->id);
+        return [
             'games' => $games,
             'totalGames' => (int)$totalGames,
             'winGames' => (int)count($wineGames),
             'averageScore' => (int)$scores['averageScore'],
             'bestScore' => (int)$scores['bestScore'],
-            'favoriteCategory' => $this->getFavoriteCategory($userId)
+            'favoriteCategory' => $this->getFavoriteCategory($user->id)
         ];
-        return $stats;
     }
 }

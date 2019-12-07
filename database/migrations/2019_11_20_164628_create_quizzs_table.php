@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 class CreateQuizzsTable extends Migration {
 
     public function up() {
-        Schema::create('quizzs', function (Blueprint $table) {
+        Schema::create('quizzes', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('genre_id');
             $table->boolean('is_active')->default(1);
@@ -17,6 +17,6 @@ class CreateQuizzsTable extends Migration {
     }
 
     public function down() {
-        Schema::dropIfExists('quizzs');
+        Schema::dropIfExists('quizzes');
     }
 }

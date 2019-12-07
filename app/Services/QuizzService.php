@@ -56,6 +56,13 @@ class QuizzService {
         return $track;
     }
 
+    /**
+     * Récupère un quiz en fonction d'un genre,
+     * qu'il faille le créer ou le récupérer
+     *
+     * @param Genre $genre
+     * @return Quizz
+     */
     public function getOrCreateQuizzByGenre(Genre $genre): Quizz {
         $quizz = $this->getActiveQuizzByGenre($genre);
 
@@ -66,10 +73,22 @@ class QuizzService {
         return $quizz;
     }
 
-    public function getActiveQuizzByGenre(Genre $genre): Quizz {
+    /**
+     * Récupère le quiz en cours d'un genre
+     *
+     * @param Genre $genre
+     * @return Quizz
+     */
+    public function getActiveQuizzByGenre(Genre $genre): ?Quizz {
         return Quizz::where('genre_id', $genre->id)->where('is_active', true)->first();
     }
 
+    /**
+     * Crée un quiz associé à un genre
+     *
+     * @param Genre $genre
+     * @return Quizz
+     */
     public function createQuizzWithGenre(Genre $genre): Quizz {
         $quizz = new Quizz();
         $quizz->genre()->associate($genre);
@@ -77,6 +96,14 @@ class QuizzService {
         return $quizz;
     }
 
+    /**
+     * Crée un quiz associé à un genre avec une liste de participants par défaut
+     * dans le cas où un nouveau quiz commence après la fin d'un autre
+     *
+     * @param Genre $genre
+     * @param Collection $users
+     * @return Quizz
+     */
     public function createQuizzWithGenreAndUsers(Genre $genre, Collection $users): Quizz {
         $quizz = $this->createQuizzWithGenre($genre);
         $quizz->users()->sync($users->map(function ($user) {
@@ -85,8 +112,15 @@ class QuizzService {
         return $quizz;
     }
 
+    /**
+     *
+     *
+     * @param $user
+     * @param Quizz $quizz
+     * @return mixed
+     */
     public function addOrRetrieveUserByQuizz($user, Quizz $quizz) {
-        $quizzUser = DB::table('quizzs_users')
+        $quizzUser = DB::table('quizzes_users')
             ->where('user_id', '=', $user->id)
             ->where('quizz_id', '=', $quizz->id)
             ->first();

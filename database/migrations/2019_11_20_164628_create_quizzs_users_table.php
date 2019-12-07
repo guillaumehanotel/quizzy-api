@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 class CreateQuizzsUsersTable extends Migration {
 
     public function up() {
-        Schema::create('quizzs_users', function (Blueprint $table) {
+        Schema::create('quizzes_users', function (Blueprint $table) {
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('quizz_id');
             $table->boolean('winner')->default(false);
@@ -17,6 +17,6 @@ class CreateQuizzsUsersTable extends Migration {
     }
 
     public function down() {
-        Schema::dropIfExists('quizzs_users');
+        Schema::dropIfExists('quizzes_users');
     }
 }

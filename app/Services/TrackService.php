@@ -13,7 +13,7 @@ class TrackService {
     public function getRandomMusic($musicNumber) {
         $artists = Artist::all()->random($musicNumber);
         return $artists->map(function (Artist $artist) {
-            return $artist->random_track;
+            return $artist->getRandomPopularTrack();
         });
     }
 
@@ -21,10 +21,10 @@ class TrackService {
         return $this->getRandomTracksByGenre(1, $genre)->first();
     }
 
-    public function getRandomTracksByGenre($musicNumber, Genre $genre) {
-        $artists = $this->getRandomArtistsByGenre($musicNumber, $genre);
+    public function getRandomTracksByGenre($number, Genre $genre) {
+        $artists = $this->getRandomArtistsByGenre($number, $genre);
         return $artists->map(function (Artist $artist) {
-            return $artist->random_track;
+            return $artist->getRandomPopularTrack();
         });
     }
 

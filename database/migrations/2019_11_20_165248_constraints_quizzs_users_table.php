@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 class ConstraintsQuizzsUsersTable extends Migration {
 
     public function up() {
-        Schema::table('quizzs_users', function (Blueprint $table) {
+        Schema::table('quizzes_users', function (Blueprint $table) {
             $table
                 ->foreign('user_id')
                 ->references('id')
@@ -18,18 +18,18 @@ class ConstraintsQuizzsUsersTable extends Migration {
             $table
                 ->foreign('quizz_id')
                 ->references('id')
-                ->on('quizzs')
+                ->on('quizzes')
                 ->onUpdate('CASCADE')
                 ->onDelete('CASCADE');
         });
     }
 
     public function down() {
-        if (Schema::hasTable('quizzs_users')) {
-            Schema::table('quizzs_users', function (Blueprint $table) {
+        if (Schema::hasTable('quizzes_users')) {
+            Schema::table('quizzes_users', function (Blueprint $table) {
                 $table->dropForeign(['user_id']);
             });
-            Schema::table('quizzs_users', function (Blueprint $table) {
+            Schema::table('quizzes_users', function (Blueprint $table) {
                 $table->dropForeign(['quizz_id']);
             });
         }
