@@ -59,6 +59,10 @@ class Quizz extends Model {
         return count($this->tracks) == 10;
     }
 
+    public function getTrackOrder() {
+        return count($this->tracks) + 1;
+    }
+
     public function disable() {
         $this->is_active = false;
         $this->save();

@@ -42,7 +42,7 @@ class QuizzService {
 
         if (!$quizz->hasReached10Tracks()) {
             $track = $this->pickRandomTrackForQuizz($quizz);
-            event(new QuizzSongStartEvent($quizz->genre->id, $track));
+            event(new QuizzSongStartEvent($quizz->genre->id, $track, $quizz->getTrackOrder()));
         }
     }
 
@@ -54,8 +54,7 @@ class QuizzService {
      */
     public function pickRandomTrackForQuizz(Quizz $quizz): Track {
         $track = $this->trackService->getRandomTrackByGenre($quizz->genre);
-        dump('picked track : ' . $track->title);
-        $quizz->tracks()->attach($track->id);
+        $quizz->tracks()->attach($track->id, ['order' => $quizz->getTrackOrder()]);
         return $track;
     }
 
