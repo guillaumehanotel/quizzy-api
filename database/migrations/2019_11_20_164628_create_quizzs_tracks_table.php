@@ -10,6 +10,7 @@ class CreateQuizzsTracksTable extends Migration {
         Schema::create('quizzes_tracks', function (Blueprint $table) {
             $table->unsignedBigInteger('quizz_id');
             $table->unsignedBigInteger('track_id');
+            $table->integer('order');
             $table->timestamps();
         });
     }

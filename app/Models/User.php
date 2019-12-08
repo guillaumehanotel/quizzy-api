@@ -29,6 +29,6 @@ class User extends Authenticatable {
     ];
 
     public function quizzes() {
-        return $this->belongsToMany('App\Models\Quizz')->withTimestamps();
+        return $this->belongsToMany('App\Models\Quizz', 'quizzes_users')->withTimestamps();
     }
 }

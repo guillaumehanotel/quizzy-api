@@ -25,9 +25,10 @@ class StatService {
             ->get();
     }
 
-    public function getAverageAndBestScore($games, $totalGames) {
+    public function getAverageAndBestScore($games) {
         $points = 0;
         $bestScore = 0;
+        $totalGames = count($games);
 
         foreach ($games as $game) {
             $points += $game->points;
@@ -38,7 +39,9 @@ class StatService {
         }
         return [
             'bestScore' => $bestScore,
-            'averageScore' => round($points / $totalGames)
+            'averageScore' => round($points / $totalGames),
+            'totalGames' => $totalGames
+
         ];
     }
 
@@ -64,13 +67,12 @@ class StatService {
 
     public function getStatsByUser(User $user) {
         $games = $this->getTotalGames($user->id);
-        $totalGames = count($games);
-        $scores = $this->getAverageAndBestScore($games, $totalGames);
-        $wineGames = $this->getWinGames($user->id);
+        $scores = $this->getAverageAndBestScore($games);
+        $winGames = $this->getWinGames($user->id);
         return [
             'games' => $games,
-            'totalGames' => (int)$totalGames,
-            'winGames' => (int)count($wineGames),
+            'totalGames' => (int)$scores['totalGames'],
+            'winGames' => (int)count($winGames),
             'averageScore' => (int)$scores['averageScore'],
             'bestScore' => (int)$scores['bestScore'],
             'favoriteCategory' => $this->getFavoriteCategory($user->id)

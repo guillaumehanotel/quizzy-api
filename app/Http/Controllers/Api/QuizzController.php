@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Events\QuizzSongInitEvent;
+use App\Events\QuizzRefreshEvent;
 use App\Jobs\OpenQuizzListening;
 use App\Models\Genre;
 use App\Models\Quizz;
+use App\Models\User;
 use App\Services\QuizzService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class QuizzController extends DingoController {
 
@@ -52,9 +55,19 @@ class QuizzController extends DingoController {
         ]);
     }
 
-    public function postUserResponse($id) {
-        $quizz = Quizz::findOrFail($id);
+    public function postUserResponse(Request $request, Genre $genre, User $user) {
+        $body = $request->json()->all();
+        $quizz = $this->quizzService->getActiveQuizzByGenre($genre);
+        $userPoints = $this->quizzService->getResponseScore($quizz, (array)$body, $user);
 
+        event(new QuizzRefreshEvent($genre->id, $quizz));
+
+        return $this->response->array([
+            'success' => true,
+            'data' => [
+                'points' => $userPoints,
+            ]
+        ]);
     }
 
 }

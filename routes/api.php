@@ -16,6 +16,7 @@ $api->version('v1', function ($api) {
         // TODO should be protected
         $api->get('/quizz/{quizz}', $QuizzController . '@getQuizzData');
         $api->get('/quizz/{genre}/askTrack', $QuizzController . '@askTrack');
+        $api->post('/quizz/{genre}/user/{user}/song', $QuizzController . '@postUserResponse');
 
         $api->get('/users/google/{google_uid}', $UserController . '@showByGoogleUid')->name('users.google.show');
         $api->post('/users', $UserController . '@store')->name('users.store');
