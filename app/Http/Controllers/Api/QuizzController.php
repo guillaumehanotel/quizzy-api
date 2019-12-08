@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\QuizzRefreshEvent;
 use App\Jobs\OpenQuizzListening;
 use App\Models\Genre;
 use App\Models\Quizz;
 use App\Models\User;
 use App\Services\QuizzService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class QuizzController extends DingoController {
@@ -53,19 +55,19 @@ class QuizzController extends DingoController {
         ]);
     }
 
-    public function postUserResponse(Request $request, $genreId, $userId) {
+    public function postUserResponse(Request $request, Genre $genre, User $user) {
         $body = $request->json()->all();
-        $user = User::find($userId);
-        $points = $this->quizzService->getResponseScore($genreId, $body);
-        $quizz = $this->quizzService->getQuizz($genreId);
+        $quizz = $this->quizzService->getActiveQuizzByGenre($genre);
+        $userPoints = $this->quizzService->getResponseScore($quizz, (array)$body, $user);
 
-        DB::table('quizzs_users')
-            ->where('user_id', $userId)
-            ->where('quizz_id', $quizz->id)
-            ->update(['points' => 2]);
+        event(new QuizzRefreshEvent($genre->id, $quizz));
 
-        // lancer un event pour refresh le game
-        return 'updated';
+        return $this->response->array([
+            'success' => true,
+            'data' => [
+                'points' => $userPoints,
+            ]
+        ]);
     }
 
 }

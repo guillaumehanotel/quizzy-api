@@ -9,6 +9,7 @@ use App\Jobs\LaunchStartQuizzEvent;
 use App\Models\Genre;
 use App\Models\Quizz;
 use App\Models\Track;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -144,19 +145,72 @@ class QuizzService {
         return $quizz->tracks()->orderBy('created_at', 'desc')->first();
     }
 
-    public function getTrack($genreId, $order) {
-        $track = DB::table('quizzs')
-            ->select('tracks.title', 'artists.name AS artist')
-            ->where('quizzs.genre_id', '=', $genreId)
-            ->where('quizzs.is_active', '=', 1)
-            ->where('quizzs_tracks.order', '=', $order)
-            ->leftJoin('quizzs_tracks', 'quizzs_tracks.quizz_id', '=', 'quizzs.id')
-            ->leftJoin('tracks', 'tracks.id', '=', 'quizzs_tracks.track_id')
-            ->leftJoin('artists', 'artists.id', '=', 'tracks.artist_id')
+    /**
+     * Récupere un user présent dans un quizz
+     * @param Quizz $quizz
+     * @param User $user
+     * @return User
+     */
+    public function getUserByQuizz(Quizz $quizz, User $user) {
+        $user = DB::table('quizzes_users')
+            ->where('user_id', (int)$user->id)
+            ->where('quizz_id', (int)$quizz->id)
             ->get();
-        return $track[0];
+        return !empty($user[0]) ? $user[0] : null;
     }
 
+    /**
+     * Met à jour les points d'un user pour un quizz donné
+     * @param Quizz $quizz
+     * @param User $user
+     * @param $points
+     * @return Number
+     */
+    public function updateUserPoints(Quizz $quizz, User $user, $points) {
+        $update = DB::table('quizzes_users')
+            ->where('user_id', (int)$user->id)
+            ->where('quizz_id', (int)$quizz->id)
+            ->update(['points' => (int)$points]);
+        return $update;
+    }
+
+    /**
+     * Récupere un user présent dans un quizz et met à jour ses points
+     * @param Quizz $quizz
+     * @param User $user
+     * @param $newPoints
+     * @return Number
+     */
+    public function setAndGetUserPoints(Quizz $quizz, User $user, $newPoints) {
+        $quizzUser = $this->getUserByQuizz($quizz, $user);
+        $points = $newPoints + $quizzUser->points;
+        $updated = $this->updateUserPoints($quizz, $user, $points);
+        return !empty($updated) ? $points : 0;
+    }
+
+    /**
+     * Retourne le titre de la track et le nom de l'artiste
+     * @param $quizzId
+     * @param $order
+     * @return Track
+     */
+    public function getTrack($quizzId, $order) {
+        $track = DB::table('quizzes')
+            ->select('tracks.title', 'artists.name AS artist')
+            ->where('quizzes.id', '=', (int)$quizzId)
+            ->where('quizzes_tracks.order', '=', (int)$order)
+            ->leftJoin('quizzes_tracks', 'quizzes_tracks.quizz_id', '=', 'quizzes.id')
+            ->leftJoin('tracks', 'tracks.id', '=', 'quizzes_tracks.track_id')
+            ->leftJoin('artists', 'artists.id', '=', 'tracks.artist_id')
+            ->get();
+        return !empty($track[0]) ? $track[0] : null;
+    }
+
+    /**
+     * Retire les accents, les parentheses et les espaces d'une string. Retourne la string en lowerCase
+     * @param $str
+     * @return String
+     */
     public function clearString($str) {
         $unwantedArray = ['Š'=>'S', 'š'=>'s', 'Ž'=>'Z', 'ž'=>'z', 'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A', 'Ç'=>'C', 'È'=>'E', 'É'=>'E',
             'Ê'=>'E', 'Ë'=>'E', 'Ì'=>'I', 'Í'=>'I', 'Î'=>'I', 'Ï'=>'I', 'Ñ'=>'N', 'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O', 'Õ'=>'O', 'Ö'=>'O', 'Ø'=>'O', 'Ù'=>'U',
@@ -167,40 +221,66 @@ class QuizzService {
         return preg_replace("/\([^)]+\)/","", str_replace(' ', '', strtolower($str)));
     }
 
-    public function getResponseScore($genreId, $body) {
-        $track = $this->getTrack($genreId, $body['order']);
+    /**
+     * Trie une string alphabetiquement
+     * @param $str
+     * @return String
+     */
+    public function sortStringAlpha($str) {
+        $split = explode(" ", $str);
+        sort($split);
+        return implode(" ", $split);
+    }
+
+    /**
+     * Calcule le score d'un user en fonction d'une réponse donnée
+     * @param Quizz $quizz
+     * @param $body
+     * @param User $user
+     * @return Number
+     */
+    public function getResponseScore(Quizz $quizz, $body, User $user) {
+        $track = $this->getTrack($quizz->id, $body['order']);
+        if (empty($track)) return 0;
+
         $artistToFind = $this->clearString($track->artist);
         $titleToFind = $this->clearString($track->title);
-        $trackStr = $artistToFind . $titleToFind;
         $input = $this->clearString((string)$body['input']);
+        $artistPregMatch = preg_match("/$artistToFind/", $input);
+        $titlePregMatch = preg_match("/$titleToFind/", $input);
+        $points = 0;
+
+        // si exact match sur artiste et titre on retourne 2 points
+        if ( !empty($artistPregMatch) && !empty($titlePregMatch) ) {
+            $points = 2;
+            return $this->setAndGetUserPoints($quizz, $user, $points);
+        }
+
+        // si exact match sur artist ou titre 1 point est ajouté
+        if ( !empty($artistPregMatch) || !empty($titlePregMatch) ) {
+            $points = 1;
+        }
+
+        // TODO: A checker pour le point bonus j'aurai bien vu un demie point
+        // on ajoute un point bonus si l'orthographe n'est pas bonne mais le resultat est proche
+        $trackSorted = $this->clearString($this->sortStringAlpha(strtolower($track->title . ' ' . $track->artist)));
+        $inputSorted = $this->clearString($this->sortStringAlpha(strtolower((string)$body['input'])));
 
         $track = new Fuse([
             [
-                "track" => $trackStr,
+                "track" => $trackSorted,
             ],
         ], [
             "keys" => [ "track" ],
             "includeScore" => true
         ]);
+        $searchResponse = $track->search($inputSorted);
 
-        $searchResponse = $track->search($input);
-        $score = $searchResponse[0]['score'];
-        $points = 0;
-
-        // si artist ou titre trouvé en exact match -> 1 point
-        if ( !empty(preg_match("/$artistToFind/", $input)) ||
-            !empty(preg_match("/$titleToFind/", $input)) ) {
-            $points = 1;
+        if ($searchResponse[0]['score'] <= 0.2) {
+            $points += 1;
         }
 
-        // si reponse exact 2 points
-        if ($score === 0) {
-            $points = 2;
-        } elseif ($score <= 0.2) {
-            $points = 1;
-        }
-
-        return $points;
+        return $this->setAndGetUserPoints($quizz, $user, $points);
     }
 
 }
