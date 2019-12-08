@@ -24,7 +24,9 @@ class QuizzRefreshEvent implements ShouldBroadcast {
     }
 
     public function broadcastWith() {
-        return $this->quizz;
+        return [
+            'quizz' => $this->quizz
+        ];
     }
 
 }
