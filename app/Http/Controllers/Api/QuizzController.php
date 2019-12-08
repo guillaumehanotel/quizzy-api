@@ -59,7 +59,6 @@ class QuizzController extends DingoController {
         $body = $request->json()->all();
         $quizz = $this->quizzService->getActiveQuizzByGenre($genre);
         $response = $this->quizzService->getResponseScore($quizz, (array)$body, $user);
-        $quizzData = $this->getQuizzData($quizz);
 
         event(new QuizzRefreshEvent($genre->id, $response));
 

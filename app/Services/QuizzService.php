@@ -247,6 +247,23 @@ class QuizzService {
     }
 
     /**
+     * Retourne un tableau contenant le score de similarité entre deux chaines de caracteres
+     * @param $strToFind
+     * @param $input
+     * @return []
+     */
+    public function getFuzzyScore($strToFind, $input) {
+        $search = new Fuse([
+            ["track" => $strToFind],
+        ], [
+            "keys" => [ "track" ],
+            "includeScore" => true
+        ]);
+
+        return $search->search($input);
+    }
+
+    /**
      * Calcule le score d'un user en fonction d'une réponse donnée
      * @param Quizz $quizz
      * @param $body
@@ -257,59 +274,35 @@ class QuizzService {
         $track = $this->getTrack($quizz->id, $body['order']);
         if (empty($track)) return 0;
 
-//        $artistToFind = $this->clearString($track->artist);
-//        $titleToFind = $this->clearString($track->title);
-//        $input = $this->clearString((string)$body['input']);
-//        $artistPregMatch = preg_match("/$artistToFind/", $input);
-//        $titlePregMatch = preg_match("/$titleToFind/", $input);
-//        $points = 0;
-//
-//        // si exact match sur artiste et titre on retourne 2 points
-//        if ( !empty($artistPregMatch) && !empty($titlePregMatch) ) {
-//            $points = 2;
-//            return $this->setAndGetUserPoints($quizz, $user, $points);
-//        }
-
-        // si exact match sur artist ou titre 1 point est ajouté
-//        if ( !empty($artistPregMatch) || !empty($titlePregMatch) ) {
-//            $points = 1;
-//        }
-
+        $artistToFind = $this->clearString($track->artist);
+        $titleToFind = $this->clearString($track->title);
+        $input = $this->clearString((string)$body['input']);
         $points = 0;
-        $artist = false;
-        $title = false;
+
+        // si exact match sur artiste et titre on retourne 2 points
+        if ( !empty(preg_match("/$artistToFind/", $input)) &&
+            !empty(preg_match("/$titleToFind/", $input)) ) {
+            $points = 2;
+            return [
+                'userId' => $user->id,
+                'points' => $this->setAndGetUserPoints($quizz, $user, $points),
+                'artist' => true,
+                'title' => true,
+            ];
+        }
 
         // on ajoute un point bonus si l'orthographe n'est pas bonne mais le resultat est proche
+        $artist = false;
+        $title = false;
+        // sorted string
+        $inputSorted = $this->clearString($this->sortStringAlpha(strtolower((string)$body['input'])));
         $allSorted = $this->clearString($this->sortStringAlpha(strtolower($track->title . ' ' .$track->artist)));
         $artistSorted = $this->clearString($this->sortStringAlpha(strtolower($track->artist)));
         $titleSorted = $this->clearString($this->sortStringAlpha(strtolower($track->title)));
-
-        $inputSorted = $this->clearString($this->sortStringAlpha(strtolower((string)$body['input'])));
-
-        $artistSearch = new Fuse([
-            ["track" => $artistSorted],
-        ], [
-            "keys" => [ "track" ],
-            "includeScore" => true
-        ]);
-
-        $titleSearch = new Fuse([
-            ["track" => $titleSorted],
-        ], [
-            "keys" => [ "track" ],
-            "includeScore" => true
-        ]);
-
-        $allSearch = new Fuse([
-            ["track" => $allSorted],
-        ], [
-            "keys" => [ "track" ],
-            "includeScore" => true
-        ]);
-
-        $artistResponse = $artistSearch->search($inputSorted);
-        $titleResponse = $titleSearch->search($inputSorted);
-        $allResponse = $allSearch->search($inputSorted);
+        // response score from sorted string
+        $allResponse = $this->getFuzzyScore($allSorted, $inputSorted);
+        $artistResponse = $this->getFuzzyScore($artistSorted, $inputSorted);
+        $titleResponse = $this->getFuzzyScore($titleSorted, $inputSorted);
 
         if (!empty($artistResponse) && $artistResponse[0]['score'] <= self::ACCEPTANCE_RATE) {
             $points += 1;
@@ -319,9 +312,10 @@ class QuizzService {
             $points += 1;
             $title = true;
         }
+
         if (!$artist && !$title) {
             if (!empty($allResponse) && $allResponse[0]['score'] <= self::ACCEPTANCE_RATE) {
-                $points += 2;
+                $points = 2;
                 $artist = true;
                 $title = true;
             }
