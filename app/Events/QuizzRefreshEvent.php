@@ -14,7 +14,7 @@ class QuizzRefreshEvent implements ShouldBroadcast {
     public $quizz;
     public $genreId;
 
-    public function __construct($genreId, Quizz $quizz) {
+    public function __construct($genreId, $quizz) {
         $this->genreId = $genreId;
         $this->quizz = $quizz;
     }
