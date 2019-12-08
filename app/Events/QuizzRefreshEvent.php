@@ -13,10 +13,11 @@ class QuizzRefreshEvent implements ShouldBroadcast {
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public $quizz;
     public $genreId;
+    public $response;
 
-    public function __construct($genreId, $quizz) {
+    public function __construct($genreId, $response) {
         $this->genreId = $genreId;
-        $this->quizz = $quizz;
+        $this->response = $response;
     }
 
     public function broadcastOn() {
@@ -24,9 +25,7 @@ class QuizzRefreshEvent implements ShouldBroadcast {
     }
 
     public function broadcastWith() {
-        return [
-            'quizz' => $this->quizz
-        ];
+        return $this->response;
     }
 
 }

@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 use \Fuse\Fuse;
 
 class QuizzService {
-
+    const ACCEPTANCE_RATE = 0.2;
     private $trackService;
 
     public function __construct() {
@@ -234,55 +234,105 @@ class QuizzService {
     }
 
     /**
+     * Check for a Fuse response.
+     * @param $response
+     * @param $points
+     * @param $value
+     */
+    private function checkResponse($response, &$points, &$value) {
+        if (!empty($response) && $response[0]['score'] <= self::ACCEPTANCE_RATE) {
+            $points += 1;
+            $value = true;
+        }
+    }
+
+    /**
      * Calcule le score d'un user en fonction d'une réponse donnée
      * @param Quizz $quizz
      * @param $body
      * @param User $user
-     * @return Number
+     * @return []
      */
     public function getResponseScore(Quizz $quizz, $body, User $user) {
         $track = $this->getTrack($quizz->id, $body['order']);
         if (empty($track)) return 0;
 
-        $artistToFind = $this->clearString($track->artist);
-        $titleToFind = $this->clearString($track->title);
-        $input = $this->clearString((string)$body['input']);
-        $artistPregMatch = preg_match("/$artistToFind/", $input);
-        $titlePregMatch = preg_match("/$titleToFind/", $input);
-        $points = 0;
-
-        // si exact match sur artiste et titre on retourne 2 points
-        if ( !empty($artistPregMatch) && !empty($titlePregMatch) ) {
-            $points = 2;
-            return $this->setAndGetUserPoints($quizz, $user, $points);
-        }
+//        $artistToFind = $this->clearString($track->artist);
+//        $titleToFind = $this->clearString($track->title);
+//        $input = $this->clearString((string)$body['input']);
+//        $artistPregMatch = preg_match("/$artistToFind/", $input);
+//        $titlePregMatch = preg_match("/$titleToFind/", $input);
+//        $points = 0;
+//
+//        // si exact match sur artiste et titre on retourne 2 points
+//        if ( !empty($artistPregMatch) && !empty($titlePregMatch) ) {
+//            $points = 2;
+//            return $this->setAndGetUserPoints($quizz, $user, $points);
+//        }
 
         // si exact match sur artist ou titre 1 point est ajouté
-        if ( !empty($artistPregMatch) || !empty($titlePregMatch) ) {
-            $points = 1;
-        }
+//        if ( !empty($artistPregMatch) || !empty($titlePregMatch) ) {
+//            $points = 1;
+//        }
 
-        // TODO: A checker pour le point bonus j'aurai bien vu un demie point
+        $points = 0;
+        $artist = false;
+        $title = false;
+
         // on ajoute un point bonus si l'orthographe n'est pas bonne mais le resultat est proche
-        $trackSorted = $this->clearString($this->sortStringAlpha(strtolower($track->title . ' ' . $track->artist)));
+        $allSorted = $this->clearString($this->sortStringAlpha(strtolower($track->title . ' ' .$track->artist)));
+        $artistSorted = $this->clearString($this->sortStringAlpha(strtolower($track->artist)));
+        $titleSorted = $this->clearString($this->sortStringAlpha(strtolower($track->title)));
+
         $inputSorted = $this->clearString($this->sortStringAlpha(strtolower((string)$body['input'])));
 
-        $track = new Fuse([
-            [
-                "track" => $trackSorted,
-            ],
+        $artistSearch = new Fuse([
+            ["track" => $artistSorted],
         ], [
             "keys" => [ "track" ],
             "includeScore" => true
         ]);
-        $searchResponse = $track->search($inputSorted);
-        if (empty($searchResponse)) return $this->setAndGetUserPoints($quizz, $user, $points);
 
-        if ($searchResponse[0]['score'] <= 0.2) {
+        $titleSearch = new Fuse([
+            ["track" => $titleSorted],
+        ], [
+            "keys" => [ "track" ],
+            "includeScore" => true
+        ]);
+
+        $allSearch = new Fuse([
+            ["track" => $allSorted],
+        ], [
+            "keys" => [ "track" ],
+            "includeScore" => true
+        ]);
+
+        $artistResponse = $artistSearch->search($inputSorted);
+        $titleResponse = $titleSearch->search($inputSorted);
+        $allResponse = $allSearch->search($inputSorted);
+
+        if (!empty($artistResponse) && $artistResponse[0]['score'] <= self::ACCEPTANCE_RATE) {
             $points += 1;
+            $artist = true;
+        }
+        if (!empty($titleResponse) && $titleResponse[0]['score'] <= self::ACCEPTANCE_RATE) {
+            $points += 1;
+            $title = true;
+        }
+        if (!$artist && !$title) {
+            if (!empty($allResponse) && $allResponse[0]['score'] <= self::ACCEPTANCE_RATE) {
+                $points += 2;
+                $artist = true;
+                $title = true;
+            }
         }
 
-        return $this->setAndGetUserPoints($quizz, $user, $points);
+        return [
+            'userId' => $user->id,
+            'points' => $this->setAndGetUserPoints($quizz, $user, $points),
+            'artist' => $artist,
+            'title' => $title,
+        ];
     }
 
 }
