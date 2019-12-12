@@ -30,8 +30,6 @@ class QuizzService {
      * @param Quizz $quizz
      */
     public function launchNextQuizzAction(Quizz $quizz) {
-        dump(count($quizz->tracks));
-
         if (!$quizz->hasNoTracks()) {
             event(new QuizzSongEndEvent($quizz->genre->id, $quizz->lastTrack()));
 
