@@ -36,7 +36,7 @@ class QuizzService {
             if ($quizz->hasReached10Tracks()) {
                 $quizz->disable();
                 $this->createQuizzWithGenreAndUsers($quizz->genre, $quizz->users);
-                event(new QuizzEndEvent($quizz->genre->id));
+                return event(new QuizzEndEvent($quizz->genre->id));
             }
         }
 
