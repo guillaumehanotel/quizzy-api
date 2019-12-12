@@ -188,8 +188,8 @@ class QuizzService {
     public function setAndGetUserPoints(Quizz $quizz, User $user, $newPoints) {
         $quizzUser = $this->getUserByQuizz($quizz, $user);
         $points = $newPoints + $quizzUser->points;
-        $updated = $this->updateUserPoints($quizz, $user, $points);
-        return !empty($updated) ? $points : 0;
+        $this->updateUserPoints($quizz, $user, $points);
+        return $points;
     }
 
     /**
