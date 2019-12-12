@@ -178,18 +178,130 @@ Pour cela Laravel propose 2 solutions :
   On va publier des évènements sur Redis, et avec le serveur de websocket on va
   souscrire à ces évènements, les recevoir et les envoyer aux clients.
 ​
+
+## Liste des events
+*QuizzStartEvent*: Crée un quizz en fonction d'un genre donné
+
+Retour
+```
+{
+    "duration": 30 // int
+}
+```
+
+---
+*QuizzSongStartEvent*: Associe et transmet une musique aléatoire au quiz
+
+Retour
+```
+{
+    "order": 1, // int
+    "track": "preview_url", // string
+    "pauseDuration": 5, // int
+}
+```
+
+---
+
+*QuizzRefreshEvent*: Actualise le jeu en fonction des réponses des participants
+
+Retour
+```
+{
+    "reponse": {
+        "userId": 1, // int
+        "points": 8, // int
+        "artist": true, // artist find ? true : false // bool
+        "title": false, // title find ? true : false // bool
+    }
+}
+```
+
+---
+
+- *QuizzSongEndEvent*: Transmet la réponse en envoyant le titre et l'artiste
+
+Retour
+```
+{
+    "artist" => "The Clash" // string
+    "title" => "London Calling", // string
+}
+```
+
+---
+*QuizzEndEvent*: Met fin au quiz
+
+Retour
+```
+{
+    "duration": 30 // int
+}
+```
+
 ​
+## Routes
+
+#### ***POST*** /api/register 
+Crée un utilisateur
+##### Paramètres
+```
+{
+    "name": "Toto" // string
+    "email": "toto@emailcom" // string
+    "password": "azertyuiop" // string
+}
+```
+
+---
+
+#### ***POST*** /api/login
+Permet d'authentifier un utilisateur
+##### Paramètres
+```
+{
+    "email": "toto@emailcom" // string
+    "password": "azertyuiop" // string
+}
+```
+---
+
+#### ***GET*** /api/logout 
+Détruit le token de l'utilisateur connecté
+
+---
+
+#### ***GET*** /api/users/google/{google_uid}
+Retourne un utilisateur via son google id
+
+---
+
+#### ***GET*** /api/me
+Retourne l'utilisateur connecté
+
+---
+
+#### Rejoindre un quiz
 ​
-### Rejoindre un quizz
-​
-Pour rejoindre un quiz il suffit de se connecter au channel 'quizz-' + genreId 
+Pour rejoindre un quiz il suffit de se connecter via les websockets au channel 'quizz-' + genreId 
 ​
 ---
-​
-#### ***GET*** /api/quizz/{id}/askTrack
-​
-Récupere une track aléatoire en fonction du genre du quizz puis lance l'event QuizzSongInitEvent
-​
+
+#### ***GET*** /api/quizz/{genre}/askTrack​
+Récupère une track aléatoire en fonction du genre du quizz puis lance l'event QuizzSongStartEvent
+
 ---
-​
-https://github.com/mpociot/laravel-apidoc-generator
+
+#### ***POST*** /api/quizz/{genre}/user/{user}/song
+Vérifie la correspondance entre la réponse du joueur et la réponse attendu puis lance l'événement *QuizzRefreshEvent*. 
+##### Paramètres
+```
+{
+    "order": 1, // number
+    "input": "The Clash London Calling" // string
+}
+```
+---
+
+#### ***GET*** /api/users/{user}/stats
+Retourne les statistiques des parties effectués par le joueur
