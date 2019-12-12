@@ -30,6 +30,14 @@ class StatService {
         $bestScore = 0;
         $totalGames = count($games);
 
+        if ($totalGames <= 0) {
+            return [
+                'bestScore' => $bestScore,
+                'averageScore' => 0,
+                'totalGames' => 0
+            ];
+        }
+
         foreach ($games as $game) {
             $points += $game->points;
 
@@ -39,9 +47,8 @@ class StatService {
         }
         return [
             'bestScore' => $bestScore,
-            'averageScore' => $totalGames <= 0 ? 0 : round($points / $totalGames),
+            'averageScore' => round($points / $totalGames),
             'totalGames' => $totalGames
-
         ];
     }
 
