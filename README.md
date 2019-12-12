@@ -282,7 +282,7 @@ Retourne l'utilisateur connecté
 ---
 
 #### Rejoindre un quiz
-​
+
 Pour rejoindre un quiz il suffit de se connecter via les websockets au channel 'quizz-' + genreId 
 ​
 ---
