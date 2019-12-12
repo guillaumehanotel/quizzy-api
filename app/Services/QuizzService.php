@@ -30,6 +30,8 @@ class QuizzService {
      * @param Quizz $quizz
      */
     public function launchNextQuizzAction(Quizz $quizz) {
+        dump(count($quizz->tracks));
+
         if (!$quizz->hasNoTracks()) {
             event(new QuizzSongEndEvent($quizz->genre->id, $quizz->lastTrack()));
 
@@ -54,6 +56,9 @@ class QuizzService {
      */
     public function pickRandomTrackForQuizz(Quizz $quizz): Track {
         $track = $this->trackService->getRandomTrackByGenre($quizz->genre);
+        if ($quizz->tracks->contains($track)) {
+            return $this->pickRandomTrackForQuizz($quizz);
+        }
         $quizz->tracks()->attach($track->id, ['order' => $quizz->getTrackOrder()]);
         return $track;
     }
