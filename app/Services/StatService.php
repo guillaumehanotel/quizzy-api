@@ -39,7 +39,7 @@ class StatService {
         }
         return [
             'bestScore' => $bestScore,
-            'averageScore' => round($points / $totalGames),
+            'averageScore' => $totalGames <= 0 ? 0 : round($points / $totalGames),
             'totalGames' => $totalGames
 
         ];

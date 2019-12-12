@@ -23,6 +23,7 @@ $api->version('v1', function ($api) {
 
         $api->get('genres', $GenreController . '@index')->name('genres.index');
         $api->get('genres/{genre}', $GenreController . '@show')->name('genres.show');
+        $api->get('/users/{user}/stats', $UserController . '@getUserStats')->name('users.getStats');
 
     });
 
@@ -34,7 +35,6 @@ $api->version('v1', function ($api) {
 
         $api->get('/users', $UserController . '@index')->name('users.index');
         $api->get('/users/{user}', $UserController . '@show')->name('users.show');
-        $api->get('/users/{user}/stats', $UserController . '@getUserStats')->name('users.getStats');
     });
 
 });
