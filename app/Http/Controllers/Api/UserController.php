@@ -3,14 +3,19 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Transformers\UserTransformer;
+use App\Services\StatService;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Validator;
 use Illuminate\Support\Str;
 
 
 class UserController extends DingoController {
+    private $statService;
+
+    public function __construct() {
+        $this->statService = new StatService();
+    }
 
     public function me() {
         return $this->response->item(Auth::user(), new UserTransformer());
@@ -26,7 +31,11 @@ class UserController extends DingoController {
         if (empty($user)) {
             return $this->response->errorNotFound("No user with Google UID : " . $googleUid);
         } else {
-            $token = $user->createToken(Str::random(32))->accessToken;
+            try {
+                $token = $user->createToken(Str::random(32))->accessToken;
+            } catch (\Exception $exception) {
+                $this->response->errorInternal("No passport client tokens found");
+            }
             $meta = [
                 'access_token' => $token,
                 'token_type' => 'bearer'
@@ -38,8 +47,7 @@ class UserController extends DingoController {
         }
     }
 
-    public function show($id) {
-        $user = User::findOrFail($id);
+    public function show(User $user) {
         return $this->response->item($user, new UserTransformer);
     }
 
@@ -65,6 +73,14 @@ class UserController extends DingoController {
             ->setStatusCode(201)
             ->setMeta($meta);
         return $response;
+    }
+
+    public function getUserStats(User $user) {
+        $stats = $this->statService->getStatsByUser($user);
+        return response()->json([
+            'success' => true,
+            'data' => $stats
+        ]);
     }
 
 }

@@ -15,6 +15,7 @@ class CreateTracksTable extends Migration {
             $table->string('preview_url');
             $table->string('album_title');
             $table->string('album_cover_url');
+            $table->bigInteger('youtube_view')->nullable();
             $table->unsignedBigInteger('artist_id');
             $table->timestamps();
         });

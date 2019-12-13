@@ -18,8 +18,19 @@ class RegisterController extends DingoController {
         return Validator::make($data, [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            // input 'password_confirmation' should be present for confirmation
+            'password' => 'required|string|min:8',
+        ], [
+            'name.required' => 'Un pseudo est requis',
+            'name.string' => 'Le pseudo doit être une chaîne de caractère',
+            'name.max' => 'Le pseudo est limité à 255 caractères',
+            'email.required' => 'Un email est requis',
+            'email.string' => 'L\'email doit être une chaîne de caractère',
+            'email.email' => 'Le format de l\'email n\'est pas valide',
+            'email.max' => 'L\'email est limité à 255 caractères',
+            'email.unique' => 'Cet email est déjà utilisé',
+            'password.required' => 'Un mot de passe est requis',
+            'password.string' => 'Un mot de passe doit être une chaîne de caractère',
+            'password.min' => 'Le mot de passe doit faire 8 caractères minimum',
         ]);
     }
 

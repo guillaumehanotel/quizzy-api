@@ -1,58 +1,27 @@
 <?php
-
 $api = app('Dingo\Api\Routing\Router');
-
 $api->version('v1', function ($api) {
-
-    $UserController = 'App\Http\Controllers\Api\UserController';
-
-//    $api->get('/',  function(){
-//        event(new \App\Events\SuccessEvent([
-//            'test' => 'helloTest'
-//        ]));
-//    });
-
-    $api->get('/quizz/create', 'App\Http\Controllers\Api\QuizzController@create');
-    $api->get('/quizz/{id}', 'App\Http\Controllers\Api\QuizzController@emitQuizzCreated');
-
     $UserController = 'App\Http\Controllers\Api\UserController';
     $GenreController = 'App\Http\Controllers\Api\GenreController';
-
-    $api->group(['middleware' => 'api'], function ($api) use ($UserController, $GenreController) {
-
-        // TODOS: placer les routes quizz dans le middleware auth:api
-        $api->post('/quizz/create', 'App\Http\Controllers\Api\QuizzController@create');
-        $api->post('/quizz/{id}/user/add', 'App\Http\Controllers\Api\QuizzController@addUserToQuizz');
-        $api->get('/quizz/{id}', 'App\Http\Controllers\Api\QuizzController@get');
-
+    $QuizzController = 'App\Http\Controllers\Api\QuizzController';
+    $api->group(['middleware' => 'api'], function ($api) use ($UserController, $GenreController, $QuizzController) {
         $api->post("register", 'App\Http\Controllers\Api\Auth\RegisterController@register');
         $api->post("login", 'App\Http\Controllers\Api\Auth\LoginController@login')->name('login');
-
+        // TODO should be protected
+        $api->get('/quizz/{quizz}', $QuizzController . '@getQuizzData');
+        $api->get('/quizz/{genre}/askTrack', $QuizzController . '@askTrack');
+        $api->post('/quizz/{genre}/user/{user}/song', $QuizzController . '@postUserResponse');
         $api->get('/users/google/{google_uid}', $UserController . '@showByGoogleUid')->name('users.google.show');
         $api->post('/users', $UserController . '@store')->name('users.store');
-
-
+        $api->get('/users/{user}/stats', $UserController . '@getUserStats')->name('users.getStats');
         $api->get('genres', $GenreController . '@index')->name('genres.index');
-        $api->get('genre/{id}', $GenreController . '@show');
-
-        /*
-        $api->get("register/{token}", 'App\Http\Controllers\Api\Auth\RegisterController@registerActivate');
-        $api->post("password/email", 'App\Http\Controllers\Api\V1\Auth\PasswordResetController@createToken');
-        $api->get("password/reset/{token}", 'App\Http\Controllers\Api\V1\Auth\PasswordResetController@findToken');
-        $api->post("password/reset", 'App\Http\Controllers\Api\V1\Auth\PasswordResetController@reset');
-        */
+        $api->get('genres/{genre}', $GenreController . '@show')->name('genres.show');
     });
-
     // Protected routes
     $api->group(['middleware' => 'auth:api'], function ($api) use ($UserController) {
-
         $api->get('me', 'App\Http\Controllers\Api\UserController@me');
         $api->get('logout', 'App\Http\Controllers\Api\Auth\LoginController@logout');
-
         $api->get('/users', $UserController . '@index')->name('users.index');
-        $api->get('/users/{id}', $UserController . '@show')->name('users.show');
-
+        $api->get('/users/{user}', $UserController . '@show')->name('users.show');
     });
-
 });
-

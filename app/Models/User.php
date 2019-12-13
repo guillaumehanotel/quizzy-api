@@ -28,7 +28,7 @@ class User extends Authenticatable {
         'email_verified_at' => 'datetime',
     ];
 
-    public function quizzs() {
-        return $this->belongsToMany('App\Models\Quizz');
+    public function quizzes() {
+        return $this->belongsToMany('App\Models\Quizz', 'quizzes_users')->withTimestamps();
     }
 }

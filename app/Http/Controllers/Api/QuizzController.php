@@ -2,76 +2,72 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Events\QuizzUserJoinedEvent;
-use App\Http\Controllers\Controller;
-use App\Http\Transformers\UserTransformer;
+use App\Events\QuizzRefreshEvent;
+use App\Jobs\OpenQuizzListening;
 use App\Models\Genre;
 use App\Models\Quizz;
-use Dingo\Api\Http\Response;
-use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use \App\Events\QuizzCreatedEvent;
+use App\Services\QuizzService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class QuizzController extends DingoController {
 
-    public function create(Request $request) {
-        try {
-            $genreData = $request->json()->get('genre');
-            $genre = Genre::findOrFail( (int)$genreData['id'] );
-            $quizz = new Quizz();
-            $quizz->genre()->associate($genre);
-            $quizz->save();
+    private $quizzService;
 
-            return response()->json([
+    public function __construct(QuizzService $quizzService) {
+        $this->quizzService = $quizzService;
+    }
+
+    public function askTrack(Genre $genre) {
+
+        $quizz = $this->quizzService->getActiveQuizzByGenre($genre);
+
+        if ($quizz === null) {
+            return $this->response->errorNotFound("No quizz found");
+        }
+
+        if ($quizz->is_listening == true) {
+            $quizz->closeListening();
+
+            $this->quizzService->launchNextQuizzAction($quizz);
+
+            OpenQuizzListening::dispatch($quizz)->delay(now()->addSecond());
+            return $this->response->array([
                 'success' => true,
-                'data' => [
-                    'quizz' => $quizz,
-                    'urlToShare' => '/quizz/' . $quizz->id
-                ]
+                'message' => 'askTrack successfully processed'
             ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'error' => $e
-            ]);
+
+        } else {
+            return $this->response->noContent();
         }
     }
 
-    public function get($id) {
-        $quizz = Quizz::findOrFail($id);
-        return response()->json([
+    public function getQuizzData(Quizz $quizz) {
+        $quizz['users'] = $quizz->users()->get();
+        $quizz['tracks'] = $quizz->tracks()->get();
+
+        return $this->response->array([
             'success' => true,
             'data' => [
-                'quizz' => $quizz,
-                'users' => $quizz->users()
+                'quizz' => $quizz
             ]
         ]);
     }
 
-    public function addUserToQuizz(Request $request, $id) {
-        try {
-            $user = $request->json()->get('user');
-            event(new QuizzUserJoinedEvent([
-                'id' => $id,
-                'user' => $user
-            ]));
+    public function postUserResponse(Request $request, Genre $genre, User $user) {
+        $body = $request->json()->all();
+        $quizz = $this->quizzService->getActiveQuizzByGenre($genre);
+        $response = $this->quizzService->getResponseScore($quizz, (array)$body, $user);
 
-            $quizz = Quizz::findOrFail($id);
-            $quizz->users()->attach((int)$user['id']);
+        event(new QuizzRefreshEvent($genre->id, $response));
 
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'quizz' => $quizz,
-                ]
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'error' => $e
-            ]);
-        }
+        return $this->response->array([
+            'success' => true,
+            'data' => [
+                'points' => $response['points'],
+            ]
+        ]);
     }
 
 }

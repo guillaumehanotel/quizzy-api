@@ -18,8 +18,10 @@ class ConstraintsArtistsTable extends Migration {
     }
 
     public function down() {
-        Schema::table('artists', function (Blueprint $table) {
-            $table->dropForeign(['genre_id']);
-        });
+        if(Schema::hasTable('artists')){
+            Schema::table('artists', function (Blueprint $table) {
+                $table->dropForeign(['genre_id']);
+            });
+        }
     }
 }
