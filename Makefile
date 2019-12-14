@@ -16,6 +16,10 @@ install:
 	make generate-keys
 	make database
 	make cache-clear
+	make echo-serve
+
+echo-server: laravel-echo-server.json.example
+	cp laravel-echo-server.json.example laravel-echo-server.json
 
 dependencies: composer.json package.json ## Installe les dépendances PHP & JS
 	@composer install
