@@ -28,7 +28,7 @@ generate-keys: ## Génération des clefs secrètes
 	@php artisan key:generate --force
 
 database: ## Migration et population de la base de donnée
-	@php artisan migrate --force
+	@php artisan migrate:refresh --force
 	@php artisan passport:install --force
 	@php artisan db:seed --force
 
