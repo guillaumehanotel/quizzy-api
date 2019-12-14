@@ -14,9 +14,9 @@ serve:
 install:
 	make dependencies
 	make generate-keys
+	make echo-server
 	make database
 	make cache-clear
-	make echo-serve
 
 echo-server: laravel-echo-server.json.example
 	cp laravel-echo-server.json.example laravel-echo-server.json
