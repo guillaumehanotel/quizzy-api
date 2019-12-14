@@ -1,7 +1,9 @@
 include .env
 export
-.PHONY: help test serve refresh-database
+.PHONY: help test serve install dependencies generate-keys database refresh-database ownership cache-clear log-clear
 .DEFAULT_GOAL= help
+
+APACHE_USER?=www-data
 
 help:
 	@grep -E '(^[a-zA-Z_-]+:.*?##.*$$)|(^##)' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[32m%-10s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m##/[33m/'
@@ -12,7 +14,8 @@ serve:
 install:
 	make dependencies
 	make generate-keys
-	make refresh-database
+	make ownership
+	make database
 	make cache-clear
 
 dependencies: composer.json package.json ## Installe les dépendances PHP & JS
@@ -29,6 +32,10 @@ database: ## Migration et population de la base de donnée
 refresh-database:
 	@php artisan migrate:refresh --seed
 	@php artisan passport:install --force
+
+ownership: bootstrap/cache storage ## Application des permissions et des appartenances
+	chown -R $(APACHE_USER):$(APACHE_USER) .*
+	chmod -R a+rw storage bootstrap/cache
 
 cache-clear:  ## Vide le cache
 	@php artisan config:cache

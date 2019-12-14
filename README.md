@@ -12,8 +12,9 @@ Par : Guillaume HANOTEL, Arnaud LAFON, Rémi MAFAT, Simon TOULOUZE
 ​
 ## Installation
 ​
-1- Créer manuellement une base de données MySQL ou MariaDB dans votre SGBD que nous nommerez 'quizzy'
+1- Créer manuellement une base de données MySQL ou MariaDB dans votre SGBD que nous nommerez 'quizzy'  
 ​
+
 2- Créez un ficher d'environnement en copiant celui de l'exemple 
 ​
 ```
