@@ -14,7 +14,6 @@ serve:
 install:
 	make dependencies
 	make generate-keys
-	make ownership
 	make database
 	make cache-clear
 
