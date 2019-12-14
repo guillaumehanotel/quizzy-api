@@ -22,10 +22,10 @@ echo-server: laravel-echo-server.json.example
 	cp laravel-echo-server.json.example laravel-echo-server.json
 
 dependencies: composer.json package.json ## Installe les dépendances PHP & JS
-	@composer install
+	@composer install --no-dev
 
 generate-keys: ## Génération des clefs secrètes
-	@php artisan key:generate
+	@php artisan key:generate --force
 
 database: ## Migration et population de la base de donnée
 	@php artisan migrate
