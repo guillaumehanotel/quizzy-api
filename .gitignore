@@ -3,6 +3,7 @@
 /public/storage
 /storage/*.key
 /storage/debugbar/.gitignore
+storage/debugbar/.gitignore
 /vendor
 .env
 .env.backup
